@@ -1,0 +1,8 @@
+module.exports = {
+  'serverPort' : '3000', // http port for the frontend server
+  'backendServerAddress' : 'YOUR-BACKEND-SERVER', // hj-backend server address, for example http//localhost:8080
+  'auth0ClientId' : 'YOUR-AUTH0-ID', // your non-interactive auth0 client id
+  'auth0ClientSecret' : 'YOUR-AUTH0-SECRET', // your non-interactive auth0 client secret
+  'auth0OauthServer' : 'YOUR-AUTH0-DOMAIN', // your auth0 domain, for example http://herkkujemma.us.auth0.com
+  'auth0Audience' : 'YOUR-DOMAIN' // your domain identifier in auth0, for example http://herkkujemma.ovh
+}

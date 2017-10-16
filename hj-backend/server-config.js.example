@@ -1,0 +1,5 @@
+module.exports = {
+  'serverPort' : '8080', // http port for the frontend server
+  'auth0Issuer': 'https://YOUR-AUTH0-DOMAIN.auth0.com/', // your auth0 domain, for example http://herkkujemma.us.auth0.com
+  'auth0Audience': 'http://YOUR-DOMAIN' // your domain identifier in auth0, for example http://herkkujemma.ovh
+}
