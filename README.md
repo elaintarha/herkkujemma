@@ -1,4 +1,4 @@
-# Project Title
+# Herkkujemma
 
 An experimental cooking recipe service to explore developing a node.js backend server with different frontend implementations.  
 
@@ -8,29 +8,51 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+Working node.js and npm installation.
 An Auth0 (free) account is required for access control mechanism. 
 
 ```
 See README-AUTH.MD for configuring Auth0 via their web interface.
 ```
 
-### Installing
+### Installing backend server
 
-Install required node packages via npm and modify the server-config files:
+Install required node packages via npm and create the server-config (see also README-AUTH):
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
 
 ```
-until finished
+cd hj-backend
+npm install express express-jwt auth0-api-jwt-rsa-validation --save
+
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+```
+cd hj-backend
+cp server-config.js.example server-config.js
+edit server-config.js
+```
+
+You should be able to start the server without errors with "node server" "http://yourserver:port/recipes"
+
+### Installing frontend server(s)
+
+Currently there is only minimal node+express+ejs frontend server included.
+
+Install required node packages via npm and create the server-config (see also README-AUTH):
+
+```
+cd cd hj-frontend-express-ejs
+npm install express ejs superagent --save
+
+```
+
+```
+cd cd hj-frontend-express-ejs/
+cp server-config.js.example server-config.js
+edit server-config.js
+```
+
+You should be able to start the server without errors with "node server" and browse "http://yourserver:port/"
 
 ## Running the tests
 
@@ -58,8 +80,8 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
+* [Express](https://expressjs.com/) - Minimal web framework for node.js
 * [Auth0](https://auth0.com/) - Authentication and authorization as service
-* [Express](https://maven.apache.org/) - Minimal web framework for node.js
 
 
 ## Contributing
