@@ -1,18 +1,17 @@
 // dependencies
+require('./config/config');
+
 const express = require('express');
 const app = express();
 const jwt = require('express-jwt');
 const rsaValidation = require('auth0-api-jwt-rsa-validation');
 
-const serverConfig = require('./server-config');
-
 const jwtCheck = jwt({
   secret: rsaValidation(),
   algorithms: ['RS256'],
-  issuer: serverConfig.auth0Issuer,
-  audience: serverConfig.auth0Audience
+  issuer: process.env.auth0Issuer,
+  audience: process.env.auth0Audience
 });
-
 
 // enable the use of the jwtCheck in all routes
 app.use(jwtCheck);
@@ -83,4 +82,6 @@ app.get('/chefs', function(req, res){
 })
 
 // launch backend server
-app.listen(serverConfig.serverPort);
+app.listen(process.env.PORT, () => {
+    console.log(`Started on port ${process.env.PORT}`);
+});

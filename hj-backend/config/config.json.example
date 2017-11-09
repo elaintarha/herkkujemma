@@ -1,0 +1,11 @@
+{
+  "development": {
+    "PORT": 8080, // HTTP port for backend server
+    "MONGODB_URI": "mongodb://localhost:27017/Herkkujemma", // DB connection string
+    "auth0Issuer": "https://YOUR-AUTH0.eu.auth0.com/", // Auth0 issuer domain
+    "auth0Audience":"http://YOUR-AUTH0.DOMAIN" // Auth0 audience domain
+  },
+  "test": {
+// same vars for test enviroment if needed
+  }
+}
