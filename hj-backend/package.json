@@ -4,7 +4,9 @@
   "description": "backend server for recipes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js",
+    "test": "export NODE_ENV=test||SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec \"npm test\""
   },
   "author": "",
   "license": "ISC",
@@ -12,5 +14,11 @@
     "auth0-api-jwt-rsa-validation": "0.0.1",
     "express": "^4.16.2",
     "express-jwt": "^5.3.0"
+  },
+  "devDependencies": {
+    "expect": "^21.2.1",
+    "mocha": "^4.0.1",
+    "nodemon": "^1.12.1",
+    "supertest": "^3.0.0"
   }
 }

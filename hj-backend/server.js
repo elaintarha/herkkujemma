@@ -13,6 +13,7 @@ const jwtCheck = jwt({
   audience: serverConfig.auth0Audience
 });
 
+
 // enable the use of the jwtCheck in all routes
 app.use(jwtCheck);
 
@@ -23,9 +24,7 @@ app.use(function (err, req, res, next) {
   }
 });
 
-
 // define token auth scopes for routes
-
 const guard = function(req, res, next){
   // case switch list for routes
   switch(req.path){
@@ -64,7 +63,7 @@ app.get('/recipes', function(req, res){
   // @todo persistence
   // harcoded list for now
   let recipes = [
-    {title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},    
+    {title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},
     {title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'}
   ]
 
@@ -74,7 +73,7 @@ app.get('/recipes', function(req, res){
 // implement the chefs API endpoint
 app.get('/chefs', function(req, res){
   // @todo persistence// @todo persistence
-  // hardcoded list for now 
+  // hardcoded list for now
   let chefs = [
     {name : 'Jaakko Saari', avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/14192643_1793745170895027_262185511564817726_n.jpg?oh=2a03ab82a6f35262b965ed99d46541a3&oe=5A43C046'},
     {name: 'Irina Saari', avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/19224792_10214266332516057_4019139626130681417_n.jpg?oh=1df9b153dcd91cb0941bad99eee7d911&oe=5A7AE8B5'}
@@ -82,7 +81,6 @@ app.get('/chefs', function(req, res){
 
   res.json(chefs);
 })
-
 
 // launch backend server
 app.listen(serverConfig.serverPort);
