@@ -1,6 +1,6 @@
 # Herkkujemma
 
-An experimental cooking recipe service to explore developing a node.js backend server with different frontend implementations.  
+An experimental cooking recipe service to explore developing a node.js API server with different client implementations.
 
 ## Getting Started
 
@@ -9,43 +9,46 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 Working node.js and npm installation.
-An Auth0 (free) account is required for access control mechanism. 
+An Auth0 (free) account is required for access control mechanism.
 
 ```
 See README-AUTH.MD for configuring Auth0 via their web interface.
 ```
+## Installation
 
-### Installing backend server
-
-Install required node packages via npm and create the server-config (see also README-AUTH):
-
+Get the project from git:
 
 ```
-cd hj-backend
-npm install express express-jwt auth0-api-jwt-rsa-validation --save
-
+git clone https://github.com/elaintarha/herkkujemma.git ./herkkujemma
 ```
 
+### Configuring API server
+
+Navigate to API server directory and do npm install:
 ```
-cd hj-backend
-cp server-config.js.example server-config.js
-edit server-config.js
+cd herkkujemma/hj-backend
+npm install
+```
+Create and edit the config file (see also README-AUTH.MD):
+```
+cp config/config.json.example config/config.json
+edit config/config.json
 ```
 
-You should be able to start the server without errors with "node server" "http://yourserver:port/recipes"
+You should be able to start the server without errors with "node server" and browse "http://yourserver:port/"
 
-### Installing frontend server(s)
+### Installing client server(s)
 
 Currently there is only minimal node+express+ejs frontend server included.
 
-Install required node packages via npm and create the server-config (see also README-AUTH):
+Navigate to backend server directory and do npm install:
 
 ```
 cd cd hj-frontend-express-ejs
 npm install express ejs superagent --save
 
 ```
-
+ Create and edit the server-config file (see also README-AUTH):
 ```
 cd cd hj-frontend-express-ejs/
 cp server-config.js.example server-config.js
@@ -58,13 +61,18 @@ You should be able to start the server without errors with "node server" and bro
 
 I haven't thought about this yet :(
 
-### Break down into end to end tests
+### API Server
+
+npm scripts for single and watcher tests are configured.
+
+```
+cd hj-backend
+npm test
+npm run test-watch
+```
+### Clients
 
 I haven't thought about this yet :(
-
-```
-Give an example
-```
 
 ### And coding style tests
 
@@ -76,10 +84,10 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+I haven't thought about this yet :(
 
 ## Built With
-
+* [Mongoose]http://mongoosejs.com/) - MongoDB boilerplate help
 * [Express](https://expressjs.com/) - Minimal web framework for node.js
 * [Auth0](https://auth0.com/) - Authentication and authorization as service
 
@@ -104,4 +112,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Stack overflow for being an invaluable source os practical information
+* Stack overflow for being an invaluable source of information
