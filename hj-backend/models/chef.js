@@ -10,6 +10,7 @@ var ChefSchema = new mongoose.Schema({
     trim: true,
     unique: true,
     validate: {
+          isAsync: false,
           validator: validator.isEmail,
           message: '{VALUE} is not a valid email'
         }
@@ -19,15 +20,19 @@ var ChefSchema = new mongoose.Schema({
     required: true,
     minlength: 3
   },
-  picture: {
+  avatar: {
     type: String
   },
-  language: {
+  locale: {
       type: String,
       required: true
   },
+  updatedAt: {
+    type: Number,
+    default: null
+  },
   recipes: [{
-    id: {
+    recipeid: {
       type: mongoose.Schema.Types.ObjectId,
       require: true
     },
@@ -39,6 +44,12 @@ var ChefSchema = new mongoose.Schema({
       type: String
     }
   }]
+});
+
+ChefSchema.pre('save', function(next) {
+  var chef = this;
+  chef.updatedAt = new Date().getTime();
+  next();  
 });
 
 

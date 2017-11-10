@@ -1,10 +1,18 @@
 // dependencies
 require('./config/config');
 
+const _ = require('lodash');
 const express = require('express');
-const app = express();
+const bodyParser = require('body-parser');
 const jwt = require('express-jwt');
 const rsaValidation = require('auth0-api-jwt-rsa-validation');
+
+var {mongoose} = require('./db/mongoose');
+const {ObjectID} = require('mongodb');
+const {Chef} = require('./models/chef');
+
+const app = express();
+app.use(bodyParser.json());
 
 const jwtCheck = jwt({
   secret: rsaValidation(),
@@ -14,7 +22,9 @@ const jwtCheck = jwt({
 });
 
 // enable the use of the jwtCheck in all routes
-app.use(jwtCheck);
+if(process.env.NODE_ENV != 'test') {
+  app.use(jwtCheck);
+}
 
 // set the default missing/incorrect token message
 app.use(function (err, req, res, next) {
@@ -53,8 +63,9 @@ const guard = function(req, res, next){
     }
   }
 }
-app.use(guard);
-
+if(process.env.NODE_ENV != 'test') {
+ app.use(guard);
+}
 // routes
 
 // implement the recipes API endpoint
@@ -67,21 +78,69 @@ app.get('/recipes', function(req, res){
   ]
 
   res.json(recipes);
-})
+});
 
-// implement the chefs API endpoint
-app.get('/chefs', function(req, res){
-  // @todo persistence// @todo persistence
-  // hardcoded list for now
-  let chefs = [
-    {name : 'Jaakko Saari', avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/14192643_1793745170895027_262185511564817726_n.jpg?oh=2a03ab82a6f35262b965ed99d46541a3&oe=5A43C046'},
-    {name: 'Irina Saari', avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/19224792_10214266332516057_4019139626130681417_n.jpg?oh=1df9b153dcd91cb0941bad99eee7d911&oe=5A7AE8B5'}
-  ];
+// implement the chefs API endpoints
 
-  res.json(chefs);
-})
+app.post('/chefs', (req, res) => {
+  var body = _.pick(req.body, ['email','name','locale','avatar']);
+  var chef = new Chef(body);
+  chef.save().then((result) => {
+    res.status(200).send(result);
+  }, (err) => {
+    res.status(400).send(err);
+  });
+});
+
+app.get('/chefs', (req, res) => {
+  Chef.find().then((chefs) => {
+    res.json(chefs);
+  }, (err) => {
+    res.status(400).send(err);
+  });
+});
+
+app.get('/chefs/:id', (req, res) => {
+  var id = req.params.id;
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Chef.findOne({_id: id})
+  .then((chef) => {
+    if(!chef) {
+      res.status(404).send();
+    }
+    res.send({chef});
+  })
+  .catch((err) => {
+    res.status(400).send();
+  });
+});
+
+app.patch('/chefs/:id', (req, res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ['name','avatar','locale']);
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Chef.findOneAndUpdate({_id: id}, {$set: body}, {new: true})
+  .then((chef) => {
+    if(!chef) {
+      return res.status(404).send();
+    }
+    res.send({chef});
+  }).catch((err) => {
+    res.status(400).send();
+  });
+
+});
 
 // launch backend server
 app.listen(process.env.PORT, () => {
     console.log(`Started on port ${process.env.PORT}`);
 });
+
+module.exports = {app};
