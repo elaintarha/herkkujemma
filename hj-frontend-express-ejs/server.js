@@ -1,39 +1,48 @@
 // declare dependencies
 const express = require('express');
 const request = require('superagent');
-const serverConfig = require('./server-config');
+const logger = require('morgan');
+const dotenv = require('dotenv');
+dotenv.load();
+
+// server credentials and token caching
+const {serverAuth} = require('./auth/auth.js');
+let serverToken;
+let serverTokenTTL = 0;
+
+
 // create express app
 const app = express();
+app.use(logger('dev'));
 
 // set the view engine to use EJS and the default views directory
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/public/views/');
 
-// set the directory to serve static assets 
+// set the directory to serve static assets
 app.use(express.static(__dirname + '/public'));
 
-// params for access token request to auth0 from config file
-var authData = {
-  client_id: serverConfig.auth0ClientId,
-  client_secret: serverConfig.auth0ClientSecret,
-  grant_type: 'client_credentials',
-  audience: serverConfig.auth0Audience
-}
-
 // make a request to the oauth/token auth0 API for (general scope) access token for accessing backend
-// @todo caching somehow instead of calling this every time?
 function getAccessToken(req, res, next){
-  request
-    .post(serverConfig.auth0OauthServer + '/oauth/token')
-    .send(authData)
-    .end(function(err, res) {	 
-      if(res.body.access_token){
-        req.access_token = res.body.access_token;
-        next();
-      } else {
-        res.send(401, 'Unauthorized');
-      }
-    })
+
+  if(serverTokenTTL>new Date().getTime()) {
+    req.access_token = serverToken;
+    next();
+  } else {
+    request
+      .post(process.env.AUTH0_SERVER_AUTH_SERVER + '/oauth/token')
+      .send(serverAuth)
+      .end(function(err, res) {
+        if(res.body.access_token){
+          serverToken = res.body.access_token;
+          serverTokenTTL = new Date().getTime() + (1000 * 3500);
+          req.access_token = res.body.access_token;
+          next();
+        } else {
+          res.send(401, 'Unauthorized');
+        }
+      });
+    }
 }
 
 // Public homepage without access control
@@ -50,7 +59,7 @@ app.get('/about', function(req, res){
 // superagent does the handling of backend request
 app.get('/recipes', getAccessToken, function(req, res){
   request
-    .get(serverConfig.backendServerAddress + '/recipes')
+    .get(process.env.BACKEND + '/recipes')
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
       if(data.status == 403){
@@ -65,7 +74,7 @@ app.get('/recipes', getAccessToken, function(req, res){
 // process is be the same for the remaining routes
 app.get('/chefs', getAccessToken, function(req, res){
   request
-    .get(serverConfig.backendServerAddress + '/chefs')
+    .get(process.env.BACKEND + '/chefs')
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
       if(data.status == 403){
@@ -78,4 +87,6 @@ app.get('/chefs', getAccessToken, function(req, res){
 })
 
 // launch the frontend server
-app.listen(serverConfig.serverPort);
+app.listen(process.env.PORT, () => {
+    console.log(`Started on port ${process.env.PORT}`);
+});
