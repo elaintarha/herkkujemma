@@ -12,12 +12,13 @@ beforeEach(populateChefs);
 describe('POST /chef', () => {
   it('should create a chef', (done) => {
     var email = 'email@example.com';
+    var sub = 'auth0|45839584594934';
     var name = 'Testijaakko';
     var locale = 'fi-FI';
 
     request(app)
       .post('/chefs')
-      .send({email, name, locale})
+      .send({email, sub, name, locale})
       .expect(200)
       .expect((res) => {
         expect(res.body._id).toBeTruthy();
@@ -30,6 +31,7 @@ describe('POST /chef', () => {
         Chef.findOne({email}).then((chef) => {
           expect(chef).toBeTruthy();
           expect(chef.email).toBe(email);
+          expect(chef.sub).toBe(sub);
           expect(chef.name).toBe(name);
           expect(chef.locale).toBe(locale);
           done();

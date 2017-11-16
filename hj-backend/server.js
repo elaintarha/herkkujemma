@@ -63,6 +63,18 @@ const guard = function(req, res, next){
       }
       break;
     }
+    // same for the chefs
+    case '/chefs/me': {
+      var permissions = ['general'];
+      for(var i = 0; i < permissions.length; i++){
+        if(req.user.scope.includes(permissions[i])){
+          next();
+        } else {
+          res.send(403, {message:'Forbidden'});
+        }
+      }
+      break;
+    }
   }
 }
 if(process.env.NODE_ENV != 'test') {
@@ -72,6 +84,7 @@ if(process.env.NODE_ENV != 'test') {
 
 // implement the recipes API endpoint
 app.get('/recipes', function(req, res){
+
   // @todo persistence
   // harcoded list for now
   let recipes = [
@@ -85,7 +98,7 @@ app.get('/recipes', function(req, res){
 // implement the chefs API endpoints
 
 app.post('/chefs', (req, res) => {
-  var body = _.pick(req.body, ['email','name','locale','avatar']);
+  var body = _.pick(req.body, ['email','sub','name','locale','avatar']);
   var chef = new Chef(body);
   chef.save().then((result) => {
     res.status(200).send(result);
@@ -99,6 +112,24 @@ app.get('/chefs', (req, res) => {
     res.json(chefs);
   }, (err) => {
     res.status(400).send(err);
+  });
+});
+
+app.get('/chefs/me', (req, res) => {
+
+  if(!req.user.sub) {
+    return res.status(400).send();
+  }
+
+  Chef.findOne({sub: req.user.sub})
+  .then((chef) => {
+    if(!chef) {
+      return res.status(404).send();
+    }
+    res.send({chef});
+  })
+  .catch((err) => {
+    res.status(400).send();
   });
 });
 

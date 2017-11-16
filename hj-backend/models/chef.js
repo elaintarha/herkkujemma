@@ -15,6 +15,11 @@ var ChefSchema = new mongoose.Schema({
           message: '{VALUE} is not a valid email'
         }
   },
+  sub: {
+    type: String,
+    required: true,
+    minlength: 8
+  },
   name: {
     type: String,
     required: true,
@@ -49,7 +54,7 @@ var ChefSchema = new mongoose.Schema({
 ChefSchema.pre('save', function(next) {
   var chef = this;
   chef.updatedAt = new Date().getTime();
-  next();  
+  next();
 });
 
 
