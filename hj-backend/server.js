@@ -2,6 +2,7 @@
 require('./config/config');
 
 const _ = require('lodash');
+const logger = require('morgan');
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('express-jwt');
@@ -12,6 +13,7 @@ const {ObjectID} = require('mongodb');
 const {Chef} = require('./models/chef');
 
 const app = express();
+app.use(logger('dev'));
 app.use(bodyParser.json());
 
 const jwtCheck = jwt({
