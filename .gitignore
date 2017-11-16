@@ -18,7 +18,11 @@ jspm_packages/
 # Optional npm cache directory
 .npm
 
+# Temp dev playground
+playground/
+
 # Secrets config file, use config.json.example to create your own
 config.json
 server-config.js
+
 .env
