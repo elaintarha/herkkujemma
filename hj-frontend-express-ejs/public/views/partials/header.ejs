@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="jumbotron text-center">
+    <h1><span class="fa fa-cutlery"></span></h1>
+    <h2>Herkkujemma</h2>
+    <% if(loggedIn) { %>
+      <a href="/">Home</a> | 
+      <a href="/chefs/me">My profile</a> |
+      <a href="/logout">Logout</a>
+    <% } else { %>
+      <a href="/login">Login</a>
+    <% } %>
+  </div>

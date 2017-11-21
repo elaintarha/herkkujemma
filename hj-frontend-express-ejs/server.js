@@ -3,6 +3,7 @@ const express = require('express');
 const request = require('superagent');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const passport = require('passport');
@@ -28,10 +29,14 @@ passport.deserializeUser(function(user, done) {
 const app = express();
 app.use(logger('dev'));
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
 // @todo conf session store
 app.use(
   session({
-    secret: 'shhhhhhhhh',
+    secret: 'shhhhhhhhh2',
     resave: true,
     saveUninitialized: true
   })
@@ -46,11 +51,27 @@ app.set('views', __dirname + '/public/views/');
 // set the directory to serve static assets
 app.use(express.static(__dirname + '/public'));
 
-// make a request to the oauth/token auth0 API for (general scope) access token for accessing backend
-function getServerAccessToken(req, res, next){
+// force all logged in users without saved profile to signup
+app.use((req, res, next) => {
+
+  if(req.user) {
+    if (req.originalUrl === '/callback' ||
+        req.originalUrl.startsWith('/chefs/signup') ||
+        req.originalUrl === '/logout') {
+      return next();
+    }
+    if(!req.user.hasProfile) {
+      return res.redirect('/chefs/signup');
+    }
+  }
+  next();
+});
+
+// use non-interactive credentials to get non-personal content from API
+function getPublicAccessToken(req, res, next){
 
   if(cachedServerAuthTokenTTL>new Date().getTime()) {
-    req.access_token = serverToken;
+    req.access_token = cachedServerAuthToken;
     next();
   } else {
     request
@@ -71,7 +92,8 @@ function getServerAccessToken(req, res, next){
 
 // Public homepage without access control
 app.get('/', function(req, res){
-  res.render('index');
+
+  res.render('index', {loggedIn: req.user});
 });
 
 // static about page
@@ -81,7 +103,7 @@ app.get('/about', function(req, res){
 
 // get token, add it to request header, get data and render it or deny
 // superagent does the handling of backend request
-app.get('/recipes', getServerAccessToken, function(req, res){
+app.get('/recipes', getPublicAccessToken, function(req, res){
   request
     .get(process.env.BACKEND + '/recipes')
     .set('Authorization', 'Bearer ' + req.access_token)
@@ -92,11 +114,11 @@ app.get('/recipes', getServerAccessToken, function(req, res){
         let recipes = data.body;
         res.render('recipes', { recipes: recipes} );
       }
-    })
+    });
 });
 
 // process is be the same for the remaining routes
-app.get('/chefs', getServerAccessToken, function(req, res){
+app.get('/chefs', getPublicAccessToken, function(req, res){
   request
     .get(process.env.BACKEND + '/chefs')
     .set('Authorization', 'Bearer ' + req.access_token)
@@ -110,9 +132,57 @@ app.get('/chefs', getServerAccessToken, function(req, res){
     })
 });
 
-// static about page
+// chef personal page
 app.get('/chefs/me', ensureUserLoggedIn, function(req, res){
-  res.render('me');
+
+  request
+   .get(process.env.BACKEND + '/chefs/me')
+   .set('Authorization', 'Bearer ' + req.user.accessToken)
+   .end(function(err, data) {
+     if(data.status == 200){
+       res.render('me',{loggedIn: req.user, chef: data.body});
+     } else {
+        res.render('error');
+     }
+   });
+
+});
+
+// chef signup page form
+app.get('/chefs/signup', ensureUserLoggedIn, function(req, res){
+
+  let signupFields = {
+    nickname: req.user.nickname,
+    email: req.user.emails[0].value,
+    picture: req.user.picture,
+    locale: req.user.locale
+  };
+  let errorMessage = req.query.err;
+  res.render('signup', {signupFields, errorMessage});
+});
+
+// chef signup page submit
+app.post('/chefs/signup', ensureUserLoggedIn, function(req, res){
+
+  let email = req.body.email;
+  let name = req.body.nickname;
+  let avatar = req.body.avatar;
+  let locale = req.body.locale;
+
+  request
+   .post(process.env.BACKEND + '/chefs')
+   .set('Authorization', 'Bearer ' + req.user.accessToken)
+   .send({email, name, locale, avatar})
+   .end(function(err, data) {
+
+     if(data.status == 200){
+       req.user.hasProfile = true;
+       res.redirect(req.session.returnTo || '/chefs/me');
+     } else {
+       req.user.hasProfile = false;
+       res.redirect('/chefs/signup?err='+err.response.text);
+     }
+   });
 });
 
 app.get('/login', passport.authenticate('auth0', userAuthParams),
@@ -130,7 +200,20 @@ app.get( '/callback',
     failureRedirect: '/failure'
   }),
   function(req, res) {
-    res.redirect(req.session.returnTo || '/chefs/me');
+
+    request
+     .get(process.env.BACKEND + '/chefs/me')
+     .set('Authorization', 'Bearer ' + req.user.accessToken)
+     .end(function(err, data) {
+       if(data.status == 200){
+         req.user.hasProfile = true;
+         res.redirect(req.session.returnTo || '/chefs/me');
+       } else {
+         req.user.hasProfile = false;
+         res.redirect('/chefs/signup');
+       }
+     });
+
   }
 );
 
