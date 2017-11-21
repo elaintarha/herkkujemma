@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const _ = require('lodash');
+const uniqueValidator = require('mongoose-unique-validator');
 
 var ChefSchema = new mongoose.Schema({
   email: {
@@ -51,12 +51,13 @@ var ChefSchema = new mongoose.Schema({
   }]
 });
 
+ChefSchema.plugin(uniqueValidator);
+
 ChefSchema.pre('save', function(next) {
   var chef = this;
   chef.updatedAt = new Date().getTime();
   next();
 });
-
 
 var Chef = mongoose.model('Chef', ChefSchema);
 

@@ -98,12 +98,17 @@ app.get('/recipes', function(req, res){
 // implement the chefs API endpoints
 
 app.post('/chefs', (req, res) => {
+
   var body = _.pick(req.body, ['email','sub','name','locale','avatar']);
+  // use the identity from auth0 in prod
+  if(req.user && req.user.sub) {
+    body.sub = req.user.sub;
+  }
   var chef = new Chef(body);
   chef.save().then((result) => {
     res.status(200).send(result);
   }, (err) => {
-    res.status(400).send(err);
+    res.status(400).send(err.message);
   });
 });
 
@@ -126,7 +131,8 @@ app.get('/chefs/me', (req, res) => {
     if(!chef) {
       return res.status(404).send();
     }
-    res.send({chef});
+
+    res.send(chef);
   })
   .catch((err) => {
     res.status(400).send();
