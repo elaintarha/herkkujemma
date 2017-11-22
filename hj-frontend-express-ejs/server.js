@@ -91,9 +91,19 @@ function getPublicAccessToken(req, res, next){
 }
 
 // Public homepage without access control
-app.get('/', function(req, res){
+app.get('/', getPublicAccessToken, function(req, res){
 
-  res.render('index', {nav:'index', loggedIn: req.user});
+  request
+    .get(process.env.BACKEND + '/recipes')
+    .set('Authorization', 'Bearer ' + req.access_token)
+    .end(function(err, data) {
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+        let recipes = data.body;
+        res.render('index', {nav:'index', loggedIn: req.user, recipes: recipes} );
+      }
+    });
 });
 
 // static about page

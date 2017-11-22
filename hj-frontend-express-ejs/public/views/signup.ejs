@@ -10,58 +10,49 @@
 
   <style>
     body {
-      background-color: #ecedec;
+      background-color: #f8f9fa;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="jumbotron text-center">
-    <h1><span class="fa fa-cutlery"></span></h1>
-    <h2>Herkkujemma</h2>
-  </div>
 
-<div class="row">
+  <h1><span class="fa fa-cutlery"></span> Herkkujemma</h1>
 
-    <div class="col-sm-8">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Welcome new masterchef!</h3>
-        </div>
-        <div class="card-body">
-          <p>Please complete your profile before continuing:</p>
-          <% if(errorMessage) { %>
-             <div class="alert alert-danger" role="alert"><%=errorMessage%></div>
-          <% } %>
-          <form action="/chefs/signup" method="post">
-           <div class="form-group">
-          	<label for="nickname">Your Chef name</label>
-            <input type="text" class="form-control" name="nickname" id="nickname" aria-describedby="nicknameHelp" placeholder="Enter Chef name" value="<%= signupFields.nickname %>">
-          </div>
-          <div class="form-group">
-            <label for="email">Email address</label>
-            <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="<%= signupFields.email %>">
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-          </div>
-          <div class="form-group">
-            <label for="locale">Your preferred language</label>
-            <select class="form-control" name="locale" id="locale">
-              <option <% if(signupFields == 'en') {%>selected<%}%>>en</option>
-              <option>fi</option>
-            </select>
-          </div>
-          <input type="hidden" name="avatar" value="<%= signupFields.picture %>" />
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        </div>
-        <div class="card-footer small">
-          <p/>
-        </div>
-      </div>
+  <div class="jumbotron">
+    <h1 class="display-3">Welcome, new masterchef!</h1>
+    <p class="lead">You're almost done, please complete your profile before continuing below.</p>
+    <hr class="my-4">
+    <% if(errorMessage) { %>
+       <div class="alert alert-danger" role="alert"><%=errorMessage%></div>
+    <% } %>
+
+    <form action="/chefs/signup" method="post">
+     <div class="form-group">
+      <label for="nickname">Your Chef name</label>
+      <input type="text" class="form-control" name="nickname" id="nickname" aria-describedby="nicknameHelp" placeholder="Enter Chef name" value="<%= signupFields.nickname %>">
     </div>
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="<%= signupFields.email %>">
+      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+      <label for="locale">Your preferred language</label>
+      <select class="form-control" name="locale" id="locale">
+        <option <% if(signupFields == 'en') {%>selected<%}%>>en</option>
+        <option>fi</option>
+      </select>
+    </div>
+    <input type="hidden" name="avatar" value="<%= signupFields.picture %>" />
+    <p class="lead">
+      <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+    </p>
+  </form>
 
   </div>
+
 </div>
 
 </body>

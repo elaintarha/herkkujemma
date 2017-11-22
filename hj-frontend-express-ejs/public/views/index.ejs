@@ -9,52 +9,30 @@
 
   <%- include ./partials/header %>
 
+  <h2>Latest recipes</h2>
+
   <div class="row">
+   <!-- EJS syntax to create a loop -->
+   <% recipes.forEach(function(recipe, index) { %>
+     <div class="col-sm-4">
+       <div class="card">
+         <div class="card-header">
+           <h3 class="card-title"><%= recipe.title %></h3>
+         </div>
+         <div class="card-body text-center">
+           <h1><%= recipe.score %> <small>/ 10</small></h1>
+         </div>
+         <div class="card-footer small">
+           <p>By <%= recipe.chef %></p>
+         </div>
+       </div>
+     </div>
+   <!-- also have to close our loop -->
+   <% }) %>
+   </div>
 
-    <div class="col-sm-4">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Recipes</h3>
-        </div>
-        <div class="card-body text-center">
-          <h1><span class="fa fa-cutlery"></span></h1>
-        </div>
-        <div class="card-footer">
-          <a href="/recipes" class="btn btn-block btn-primary">Browse Recipes</a>
-        </div>
-      </div>
-    </div>
+   </div>
 
-    <div class="col-sm-4">
-      <div class="card">
-
-        <div class="card-header">
-          <h3 class="card-title">Chefs</h3>
-        </div>
-        <div class="card-body text-center">
-          <h1><span class="fa fa-users"></span></h1>
-        </div>
-        <div class="card-footer">
-          <a href="/chefs" class="btn btn-block btn-primary">View Chefs</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-sm-4">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">About</h3>
-        </div>
-        <div class="card-body text-center">
-          <h1><span class="fa fa-user-secret "></span></h1>
-        </div>
-        <div class="card-footer">
-          <a href="/about" class="btn btn-block btn-primary">About us</a>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </div>
 
 </body>
