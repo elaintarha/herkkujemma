@@ -18,12 +18,9 @@
 
 <div class="container">
   <div class="jumbotron text-center">
-    <a href="/">
     <h1><span class="fa fa-cutlery"></span></h1>
     <h2>Herkkujemma</h2>
-	</a>
   </div>
-
 
 <div class="row">
 
@@ -32,22 +29,30 @@
         <div class="card-header">
           <h3 class="card-title">Welcome new masterchef!</h3>
         </div>
-        <div class="card-body text-center">
+        <div class="card-body">
           <p>Please complete your profile before continuing:</p>
           <% if(errorMessage) { %>
-            <p><%=errorMessage%></p>
+             <div class="alert alert-danger" role="alert"><%=errorMessage%></div>
           <% } %>
           <form action="/chefs/signup" method="post">
-          <dl>
-          	<dt>Your Chef name</dt>
-          	<dd><input type="text" name="nickname" value="<%= signupFields.nickname %>" /></dd>
-            <dt>Your email address</dt>
-            <dd><input type="text" name="email" value="<%= signupFields.email %>" /></dd>
-            <dt>Your preferred language</dt>
-            <dd><input type="text" name="locale" value="<%= signupFields.locale %>" /></dd>
-          </dl>          
+           <div class="form-group">
+          	<label for="nickname">Your Chef name</label>
+            <input type="text" class="form-control" name="nickname" id="nickname" aria-describedby="nicknameHelp" placeholder="Enter Chef name" value="<%= signupFields.nickname %>">
+          </div>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="<%= signupFields.email %>">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+          </div>
+          <div class="form-group">
+            <label for="locale">Your preferred language</label>
+            <select class="form-control" name="locale" id="locale">
+              <option <% if(signupFields == 'en') {%>selected<%}%>>en</option>
+              <option>fi</option>
+            </select>
+          </div>
           <input type="hidden" name="avatar" value="<%= signupFields.picture %>" />
-          <input type="submit" value="Proceed"/>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         </div>
         <div class="card-footer small">

@@ -39,6 +39,7 @@ app.use(function (err, req, res, next) {
 const guard = function(req, res, next){
   // case switch list for routes
   switch(req.path){
+
     // if the request is for recipes it needs general scope
     case '/recipes' : {
       var permissions = ['general'];
@@ -63,7 +64,7 @@ const guard = function(req, res, next){
       }
       break;
     }
-    // same for the chefs
+    // same for the logged in chef
     case '/chefs/me': {
       var permissions = ['general'];
       for(var i = 0; i < permissions.length; i++){
@@ -74,6 +75,23 @@ const guard = function(req, res, next){
         }
       }
       break;
+    }
+    // @todo this doesnt work
+    case '/chefs/:id': {
+
+      var permissions = ['general'];
+      for(var i = 0; i < permissions.length; i++){
+        if(req.user.scope.includes(permissions[i])){
+          next();
+        } else {
+          res.send(403, {message:'Forbidden'});
+        }
+      }
+      break;
+    }
+    default: {
+      console.log('Guard missed path (not good): ', req.path);
+      next();
     }
   }
 }
@@ -148,9 +166,9 @@ app.get('/chefs/:id', (req, res) => {
   Chef.findOne({_id: id})
   .then((chef) => {
     if(!chef) {
-      res.status(404).send();
+      return res.status(404).send();
     }
-    res.send({chef});
+    res.send(chef);
   })
   .catch((err) => {
     res.status(400).send();

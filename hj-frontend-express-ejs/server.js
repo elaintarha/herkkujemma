@@ -93,12 +93,12 @@ function getPublicAccessToken(req, res, next){
 // Public homepage without access control
 app.get('/', function(req, res){
 
-  res.render('index', {loggedIn: req.user});
+  res.render('index', {nav:'index', loggedIn: req.user});
 });
 
 // static about page
 app.get('/about', function(req, res){
-  res.render('about');
+  res.render('about', {nav:'about', loggedIn: req.user});
 });
 
 // get token, add it to request header, get data and render it or deny
@@ -112,7 +112,7 @@ app.get('/recipes', getPublicAccessToken, function(req, res){
         res.send(403, '403 Forbidden');
       } else {
         let recipes = data.body;
-        res.render('recipes', { recipes: recipes} );
+        res.render('recipes', {nav:'recipes', loggedIn: req.user, recipes: recipes} );
       }
     });
 });
@@ -127,25 +127,9 @@ app.get('/chefs', getPublicAccessToken, function(req, res){
         res.send(403, '403 Forbidden');
       } else {
         let chefs = data.body;
-        res.render('chefs', {chefs : chefs});
+        res.render('chefs', {nav:'chefs', loggedIn: req.user, chefs: chefs});
       }
     })
-});
-
-// chef personal page
-app.get('/chefs/me', ensureUserLoggedIn, function(req, res){
-
-  request
-   .get(process.env.BACKEND + '/chefs/me')
-   .set('Authorization', 'Bearer ' + req.user.accessToken)
-   .end(function(err, data) {
-     if(data.status == 200){
-       res.render('me',{loggedIn: req.user, chef: data.body});
-     } else {
-        res.render('error');
-     }
-   });
-
 });
 
 // chef signup page form
@@ -184,6 +168,38 @@ app.post('/chefs/signup', ensureUserLoggedIn, function(req, res){
      }
    });
 });
+
+// chef personal page
+app.get('/chefs/me', ensureUserLoggedIn, function(req, res){
+
+  request
+   .get(process.env.BACKEND + '/chefs/me')
+   .set('Authorization', 'Bearer ' + req.user.accessToken)
+   .end(function(err, data) {
+     if(data.status == 200){
+       res.render('me',{nav: 'me', loggedIn: req.user, chef: data.body});
+     } else {
+        res.render('error');
+     }
+   });
+});
+
+app.get('/chefs/:id', getPublicAccessToken, function(req, res){
+
+  var id = req.params.id;
+
+  request
+    .get(process.env.BACKEND + '/chefs/' + id)
+    .set('Authorization', 'Bearer ' + req.access_token)
+    .end(function(err, data) {
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+      res.render('chef', {nav:'chefs', loggedIn: req.user, chef: data.body});
+      }
+    })
+});
+
 
 app.get('/login', passport.authenticate('auth0', userAuthParams),
   function(req, res) {

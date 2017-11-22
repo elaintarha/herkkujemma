@@ -1,12 +1,35 @@
-<div class="container">
-  <div class="jumbotron text-center">
-    <h1><span class="fa fa-cutlery"></span></h1>
-    <h2>Herkkujemma</h2>
-    <% if(loggedIn) { %>
-      <a href="/">Home</a> | 
-      <a href="/chefs/me">My profile</a> |
-      <a href="/logout">Logout</a>
-    <% } else { %>
-      <a href="/login">Login</a>
-    <% } %>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/"><span class="fa fa-cutlery"></span>Herkkujemma</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item <%if(nav=='index'){%>active<%}%>">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item <%if(nav=='recipes'){%>active<%}%>">
+        <a class="nav-link" href="/recipes">Recipes</a>
+      </li>
+      <li class="nav-item <%if(nav=='chefs'){%>active<%}%>">
+        <a class="nav-link" href="/chefs">Chefs</a>
+      </li>
+      <li class="nav-item <%if(nav=='about'){%>active<%}%>">
+        <a class="nav-link" href="/about">About</a>
+      </li>
+     <% if(loggedIn) { %>
+      <li class="nav-item <%if(nav=='me'){%>active<%}%>">
+        <a class="nav-link" href="/chefs/me">My profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Logout</a>
+      </li>
+      <% } else { %>
+        <a class="nav-link" href="/login">Login</a>
+      <% } %>
+    </ul>
   </div>
+</nav>
+<div class="container">
+<br/>
