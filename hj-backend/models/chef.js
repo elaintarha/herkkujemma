@@ -37,10 +37,6 @@ var ChefSchema = new mongoose.Schema({
     default: null
   },
   recipes: [{
-    recipeid: {
-      type: mongoose.Schema.Types.ObjectId,
-      require: true
-    },
     name: {
       type: String,
       require: true

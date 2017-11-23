@@ -11,6 +11,7 @@ const rsaValidation = require('auth0-api-jwt-rsa-validation');
 var {mongoose} = require('./db/mongoose');
 const {ObjectID} = require('mongodb');
 const {Chef} = require('./models/chef');
+const {Recipe} = require('./models/recipe');
 
 const app = express();
 app.use(logger('dev'));
@@ -100,7 +101,52 @@ if(process.env.NODE_ENV != 'test') {
 }
 // routes
 
-// implement the recipes API endpoint
+// implement the recipes API endpoints
+
+app.post('/recipes', (req, res) => {
+
+  var body = _.pick(req.body, ['name', 'description', 'chef', 'locale']);
+
+  let chefIdField = '_id';
+  let chefIdValue = body.chef;
+  // use the identity from auth0 in prod
+  if(req.user && req.user.sub) {
+    chefIdField = 'sub';
+    chefIdValue = req.user.sub;
+  }
+
+  let chef;
+  let recipe;
+
+  if(!ObjectID.isValid(body.chef)) {
+    return res.status(400).send();
+  }
+
+  Chef.findOne({[chefIdField]: chefIdValue})
+  .then((chefDb) => {
+    if(!chefDb) {
+      return res.status(400).send();
+    }
+    chef = chefDb;
+    recipe = new Recipe(body);
+    return recipe.save();
+  }, (err) => {
+      return res.status(400).send(err.message);
+  })
+  .then((recipeDb) => {
+    recipe = recipeDb;
+    chef.recipes.push(recipeDb);
+    return chef.save();
+  })
+  .then((chefDb2) => {
+    return res.status(200).send(recipe);
+  })
+  .catch((err) => {
+    res.status(400).send(err.message);
+  });
+
+});
+
 app.get('/recipes', function(req, res){
 
   // @todo persistence
@@ -139,7 +185,6 @@ app.get('/recipes/:id', (req, res) => {
   res.json(recipe);
 });
 // implement the chefs API endpoints
-
 app.post('/chefs', (req, res) => {
 
   var body = _.pick(req.body, ['email','sub','name','locale','avatar']);

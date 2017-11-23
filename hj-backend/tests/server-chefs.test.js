@@ -74,8 +74,8 @@ describe('GET /chefs/:id', () => {
     request(app)
       .get(`/chefs/${chefs[1]._id.toHexString()}`)
       .expect(200)
-      .expect((res) => {
-        expect(res.body.chef.email).toBe(chefs[1].email);
+      .expect((res) => {        
+        expect(res.body.email).toBe(chefs[1].email);
       })
       .end(done);
   });

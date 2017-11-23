@@ -1,6 +1,7 @@
 const {ObjectID} = require('mongodb');
 
 const {Chef} = require('./../../models/chef');
+const {Recipe} = require('./../../models/recipe');
 
 const chefOneId = new ObjectID();
 const chefTwoId = new ObjectID();
@@ -21,11 +22,26 @@ const chefs = [{
   locale: 'fi-FI',
   avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/14192643_1793745170895027_262185511564817726_n.jpg?oh=2a03ab82a6f35262b965ed99d46541a3&oe=5A43C046',
   recipes: [{
-    recipeid: recipeOneId,
-    name: 'Butter chicken'
+    _id: recipeOneId,
+    name: 'Chicken korma'
   }]
 }];
 
+const recipes = [{
+  _id: recipeOneId,
+  name: 'Chicken korma',
+  description: 'Delicious butter chicken',
+  chef: chefTwoId,
+  locale: 'fi-FI',
+}];
+const populateRecipes = (done) => {
+
+  Recipe.remove({}).then(() => {
+    var recipeOne = new Recipe(recipes[0]).save();
+
+    return Promise.all([recipeOne])
+  }).then(() => done());
+};
 
 const populateChefs = (done) => {
 
@@ -38,5 +54,5 @@ const populateChefs = (done) => {
 };
 
 module.exports = {
-  chefs, populateChefs
+  chefs, recipes, populateChefs, populateRecipes
 };
