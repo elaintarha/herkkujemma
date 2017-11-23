@@ -107,7 +107,11 @@ app.get('/recipes', function(req, res){
   // harcoded list for now
   let recipes = [
     {title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},
-    {title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'}
+    {title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {title : 'Thai chicken', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {title : 'Pumpkin soup', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {title : 'Pollo limonello', release : '2017', chef: 'Jaakko Saari', score: '9.2'},
+    {title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'}
   ]
 
   res.json(recipes);

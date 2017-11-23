@@ -6,25 +6,27 @@
 <body>
 
  <%- include ./partials/header %>
- <h2>All recipes</h2>
+
+ <h3>All recipes</h3>
 
  <div class="row">
-  <!-- EJS syntax to create a loop -->
   <% recipes.forEach(function(recipe, index) { %>
-    <div class="col-sm-4">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title"><%= recipe.title %></h3>
+
+    <div class="col-md-4">
+
+      <div class="card" style="width: 20rem;">
+        <img class="card-img-top" data-src="holder.js/100px100?random=yes&text=No image yet" alt="Delicious image">
+        <div class="card-body">
+          <h4 class="card-title"><%= recipe.title %></h4>
+          <p class="card-text"><%= recipe.score %> <small>/ 10</small></p>
         </div>
-        <div class="card-body text-center">
-          <h1><%= recipe.score %> <small>/ 10</small></h1>
-        </div>
-        <div class="card-footer small">
-          <p>By <%= recipe.chef %></p>
-        </div>
-      </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">By <%= recipe.chef %></li>
+        </ul>
+     </div>
+
     </div>
-  <!-- also have to close our loop -->
+    
   <% }) %>
   </div>
 
