@@ -106,17 +106,38 @@ app.get('/recipes', function(req, res){
   // @todo persistence
   // harcoded list for now
   let recipes = [
-    {title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},
-    {title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {title : 'Thai chicken', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {title : 'Pumpkin soup', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {title : 'Pollo limonello', release : '2017', chef: 'Jaakko Saari', score: '9.2'},
-    {title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'}
+    {_id: '4244f', title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},
+    {_id: '4244f', title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {_id: '4244f', title : 'Thai chicken', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {_id: '4244f', title : 'Pumpkin soup', release : '2017', chef: 'Irina Slastunina', score: '10'},
+    {_id: '4244f', title : 'Pollo limonello', release : '2017', chef: 'Jaakko Saari', score: '9.2'},
+    {_id: '4244f', title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'}
   ]
 
   res.json(recipes);
 });
 
+app.get('/recipes/:id', (req, res) => {
+/*  var id = req.params.id;
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Chef.findOne({_id: id})
+  .then((chef) => {
+    if(!chef) {
+      return res.status(404).send();
+    }
+    res.send(chef);
+  })
+  .catch((err) => {
+    res.status(400).send();
+  });
+  */
+  let recipe = {_id: '4244f', title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'};
+  recipe.chef = {name: 'Irina Slastunina', avatar: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/14192643_1793745170895027_262185511564817726_n.jpg?oh=0a042a72c075f5d1d258662ebfb0192c&oe=5AA3A5D7'}
+  res.json(recipe);
+});
 // implement the chefs API endpoints
 
 app.post('/chefs', (req, res) => {
