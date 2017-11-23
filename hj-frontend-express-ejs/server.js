@@ -127,6 +127,22 @@ app.get('/recipes', getPublicAccessToken, function(req, res){
     });
 });
 
+app.get('/recipes/:id', getPublicAccessToken, function(req, res){
+
+  var id = req.params.id;
+
+  request
+    .get(process.env.BACKEND + '/recipes/' + id)
+    .set('Authorization', 'Bearer ' + req.access_token)
+    .end(function(err, data) {
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+      res.render('recipe', {nav:'recipes', loggedIn: req.user, recipe: data.body});
+      }
+    })
+});
+
 // process is be the same for the remaining routes
 app.get('/chefs', getPublicAccessToken, function(req, res){
   request

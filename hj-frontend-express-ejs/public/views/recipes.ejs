@@ -15,9 +15,9 @@
     <div class="col-md-4">
 
       <div class="card mt-3">
-        <img class="card-img-top" data-src="holder.js/100px100?random=yes&text=No image yet" alt="Delicious image">
+        <img class="card-img-top" data-src="holder.js/100px100?random=yes&font=FontAwesome&size=20&text=&#xf0f5;" alt="Delicious image">
         <div class="card-body">
-          <h4 class="card-title"><%= recipe.title %></h4>
+          <h4 class="card-title"><a href="/recipes/<%=recipe._id%>"><%= recipe.title %></a></h4>
           <p class="card-text"><%= recipe.score %> <small>/ 10</small></p>
         </div>
         <ul class="list-group list-group-flush">
