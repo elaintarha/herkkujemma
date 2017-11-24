@@ -1,0 +1,17 @@
+<div class="row">
+ <% recipes.forEach(function(recipe, index) { %>
+   <div class="col-md-4">
+
+     <div class="card mt-3">
+       <img class="card-img-top" data-src="holder.js/100px100?random=yes&font=FontAwesome&size=20&text=&#xf0f5;" alt="Delicious image">
+       <div class="card-body">
+         <h4 class="card-title"><a href="/recipes/<%=recipe._id%>"><%= recipe.name %></a></h4>
+         <p class="card-text"><%= recipe.description %></p>
+       </div>
+       <ul class="list-group list-group-flush">
+         <li class="list-group-item"><img class="rounded-circle" src="<%=recipe.chef.avatar%>" /> <%=recipe.chef.name%></li>
+       </ul>
+    </div>
+   </div>
+ <% }) %>
+ </div>

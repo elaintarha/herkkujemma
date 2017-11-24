@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include ./partials/head %>
+</head>
+<body>
+
+<%- include ./partials/header %>
+
+<div class="jumbotron">
+  <h2 class="display-3"><%=recipe.name%></h2>
+  <p class="lead"><img src="<%=recipe.chef.avatar%>" class="rounded-circle"/> <%=recipe.chef.name%>
+  <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
+  <a class="btn btn-primary btn-sm" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a></p>
+  <% } %>
+  <hr class="my-4">
+
+  <p><%=recipe.description%></p>
+  <!--
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+  </p>
+-->
+</div>
+
+
+
+  </div>
+</div>
+
+</body>
+</html>

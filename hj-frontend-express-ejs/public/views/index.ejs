@@ -11,26 +11,8 @@
 
   <h3>Latest recipes</h3>
 
-  <div class="row">
-   <% recipes.forEach(function(recipe, index) { %>
-     <div class="col-md-4">
+    <%- include ./partials/recipes-deck %>
 
-       <div class="card mt-3">
-         <img class="card-img-top" data-src="holder.js/100px100?random=yes&font=FontAwesome&size=20&text=&#xf0f5;" alt="Delicious image">
-         <div class="card-body">
-           <h4 class="card-title"><a href="/recipes/<%=recipe._id%>"><%= recipe.title %></a></h4>
-           <p class="card-text"><%= recipe.score %> <small>/ 10</small></p>
-         </div>
-         <ul class="list-group list-group-flush">
-           <li class="list-group-item"><img class="rounded-circle" src="https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/14192643_1793745170895027_262185511564817726_n.jpg?oh=0a042a72c075f5d1d258662ebfb0192c&oe=5AA3A5D7" /> <%=recipe.chef%></li>
-         </ul>
-      </div>
-
-     </div>
-   <% }) %>
-   </div>
-
-   </div>
 
 </div>
 

@@ -22,7 +22,7 @@
           <ul class="list-group">
             <li class="list-group-item">My recipes</li>
             <% chef.recipes.forEach(function(recipe, index) { %>
-              <li class="list-group-item"><%=recipe.name%></li>
+              <li class="list-group-item"><a href="/recipes/<%=recipe._id%>"><%=recipe.name%></a></li>
             <% }) %>
             <% if(chef.recipes.length === 0){ %>
               <li class="list-group-item">No recipes yet!</li>

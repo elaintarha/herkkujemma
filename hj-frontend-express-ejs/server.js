@@ -113,6 +113,44 @@ app.get('/about', function(req, res){
 
 // get token, add it to request header, get data and render it or deny
 // superagent does the handling of backend request
+app.post('/recipes', ensureUserLoggedIn, function(req, res){
+
+  let name = req.body.name;
+  let description = req.body.description;
+  let locale = req.body.locale;
+  let _id = req.body._id;
+
+  if(_id) {
+    request
+     .patch(process.env.BACKEND + '/recipes')
+     .set('Authorization', 'Bearer ' + req.user.accessToken)
+     .send({_id, name, description, locale})
+     .end(function(err, data) {
+       return handlePostRecipeResult(req, res, err, data);
+     });
+  } else {
+    request
+     .post(process.env.BACKEND + '/recipes')
+     .set('Authorization', 'Bearer ' + req.user.accessToken)
+     .send({name, description, locale})
+     .end(function(err, data) {
+       return handlePostRecipeResult(req, res, err, data);
+     });
+  }
+});
+
+function handlePostRecipeResult(req, res, err, data) {
+  if(data.status == 200){
+    res.redirect('/recipes/'+data.body._id);
+  } else {
+    if(req.body._id) {
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: req.body, errorMessage: err.response.text});
+    } else {
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Add', recipe: req.body, errorMessage: err.response.text});
+    }
+  }
+}
+
 app.get('/recipes', getPublicAccessToken, function(req, res){
   request
     .get(process.env.BACKEND + '/recipes')
@@ -127,6 +165,30 @@ app.get('/recipes', getPublicAccessToken, function(req, res){
     });
 });
 
+app.get('/recipes/add', ensureUserLoggedIn, function(req, res){
+  let errorMessage = req.query.err
+  let recipe = {name: ''};
+  res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Add', recipe: recipe, errorMessage: errorMessage});
+});
+
+app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res){
+
+  let errorMessage = req.query.err
+  var id = req.params.id;
+
+  request
+    .get(process.env.BACKEND + '/recipes/' + id)
+    .set('Authorization', 'Bearer ' + req.user.accessToken)
+    .end(function(err, data) {
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+        res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: data.body, errorMessage: errorMessage});
+      }
+    })
+});
+
+
 app.get('/recipes/:id', getPublicAccessToken, function(req, res){
 
   var id = req.params.id;
@@ -138,7 +200,7 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-      res.render('recipe', {nav:'recipes', loggedIn: req.user, recipe: data.body});
+      res.render('recipe-view', {nav:'recipes', loggedIn: req.user, recipe: data.body});
       }
     })
 });

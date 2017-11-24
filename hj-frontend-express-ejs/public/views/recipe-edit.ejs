@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include ./partials/head %>
+</head>
+<body>
+
+  <%- include ./partials/header %>
+
+    <div class="jumbotron">
+      <h3 class="display-3">
+      <%if(title == 'Edit') {%>Edit<%}else {%>Add new<%}%> recipe
+      </h3>
+      <p class="lead">You're almost famous now, just spill the secrets of your dish!</p>
+      <hr class="my-4">
+      <% if(errorMessage) { %>
+         <div class="alert alert-danger" role="alert"><%=errorMessage%></div>
+      <% } %>
+
+      <form action="/recipes" method="post">
+       <div class="form-group">
+        <label for="name">Recipe name</label>
+        <input type="text" class="form-control"
+        name="name" id="name" aria-describedby="nameHelp" placeholder="Enter recipe name"
+        <%if(recipe.name) {%>value="<%=recipe.name%>"<% } %> />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description"
+        aria-describedby="descriptionHelp" rows="3"><%if(recipe.description) {%><%=recipe.description%><% } %></textarea>
+
+        <small id="descriptionHelp" class="form-text text-muted">Add few words about this wonderful recipe, please.</small>
+      </div>
+      <div class="form-group">
+        <label for="locale">Recipe language</label>
+        <select class="form-control" name="locale" id="locale">
+          <option <%if(recipe.locale == 'en') {%>selected<% } %>>en</option>
+          <option <%if(recipe.locale == 'fi') {%>selected<% } %>>fi</option>
+        </select>
+      </div>
+      <%if(recipe._id) {%>
+        <input type="hidden" name="_id" value="<%= recipe._id %>" />
+      <% } %>
+      <p class="lead">
+        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+      </p>
+    </form>
+    </div>
+
+  </div>
+
+</body>
+</html>

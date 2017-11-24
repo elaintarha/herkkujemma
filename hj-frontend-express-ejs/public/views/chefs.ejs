@@ -22,12 +22,12 @@
           </p>
           <ul>
           <% chef.recipes.forEach(function(recipe, index) { %>
-            <li><%=recipe.name%></li>
+            <li><a href="/recipes/<%=recipe._id%>"><%=recipe.name%></a></li>
           <% }) %>
         </ul>
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item"><a href="/chefs/<%=chef._id%>" class="card-link">See profile</a></li>          
+          <li class="list-group-item"><a href="/chefs/<%=chef._id%>" class="card-link">See profile</a></li>
         </ul>
       </div>
 
