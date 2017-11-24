@@ -37,6 +37,7 @@ app.use(function (err, req, res, next) {
 });
 
 // define token auth scopes for routes
+// @todo this doesn't work at all with parameterized routes
 const guard = function(req, res, next){
   // case switch list for routes
   switch(req.path){
@@ -102,7 +103,6 @@ if(process.env.NODE_ENV != 'test') {
 // routes
 
 // implement the recipes API endpoints
-
 app.post('/recipes', (req, res) => {
 
   var body = _.pick(req.body, ['name', 'description', 'chef', 'locale']);
@@ -118,7 +118,7 @@ app.post('/recipes', (req, res) => {
   let chef;
   let recipe;
 
-  if(!ObjectID.isValid(body.chef)) {
+  if(chefIdField == '_id' && !ObjectID.isValid(body.chef)) {
     return res.status(400).send();
   }
 
@@ -128,6 +128,8 @@ app.post('/recipes', (req, res) => {
       return res.status(400).send();
     }
     chef = chefDb;
+    body.chef = chef;
+
     recipe = new Recipe(body);
     return recipe.save();
   }, (err) => {
@@ -142,48 +144,97 @@ app.post('/recipes', (req, res) => {
     return res.status(200).send(recipe);
   })
   .catch((err) => {
+    console.log('Error saving recipe', err);
     res.status(400).send(err.message);
   });
 
 });
 
+app.patch('/recipes', (req, res) => {
+
+  var body = _.pick(req.body, ['_id', 'name', 'description', 'chef', 'locale']);
+
+  let chefIdField = '_id';
+  let chefIdValue = body.chef;
+  // use the identity from auth0 in prod
+  if(req.user && req.user.sub) {
+    chefIdField = 'sub';
+    chefIdValue = req.user.sub;
+  }
+
+  let chef;
+  let recipe;
+
+  if(chefIdField == '_id' && !ObjectID.isValid(body.chef)) {
+    return res.status(400).send();
+  }
+
+  Chef.findOne({[chefIdField]: chefIdValue})
+  .then((chefDb) => {
+    if(!chefDb) {
+      return res.status(400).send();
+    }
+    chef = chefDb;
+    return Recipe.findOne({_id: body._id}).populate('chef')
+  }, (err) => {
+      return res.status(400).send(err.message);
+  })
+  .then((recipeDb) => {
+    if(!recipeDb) {
+      throw 'Recipe was not found';
+    }
+    if(recipeDb.chef._id.toHexString() !== chef._id.toHexString()) {
+      throw 'This is not your recipe';
+    }
+    recipeDb.name = body.name;
+    recipeDb.description = body.description;
+    recipeDb.locale = body.locale;
+    return recipeDb.save();
+  })
+  .then((recipeDb2) => {
+    recipe = recipeDb2;
+    let recipeRef = chef.recipes.find(o => o._id.toHexString() === recipeDb2._id.toHexString());
+    recipeRef.name = recipeDb2.name;
+    return chef.save();
+  })
+  .then((chefDb2) => {
+    return res.status(200).send(recipe);
+  })
+  .catch((err) => {
+    console.log('Error saving recipe', err);
+    res.status(400).send(err.message);
+  });
+});
+
 app.get('/recipes', function(req, res){
 
-  // @todo persistence
-  // harcoded list for now
-  let recipes = [
-    {_id: '4244f', title : 'Salmon soup', release: '2017', chef: 'Jaakko Saari', score: '8.8'},
-    {_id: '4244f', title : 'Nyhtis casserole', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {_id: '4244f', title : 'Thai chicken', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {_id: '4244f', title : 'Pumpkin soup', release : '2017', chef: 'Irina Slastunina', score: '10'},
-    {_id: '4244f', title : 'Pollo limonello', release : '2017', chef: 'Jaakko Saari', score: '9.2'},
-    {_id: '4244f', title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'}
-  ]
-
-  res.json(recipes);
+  Recipe.find().populate('chef')
+  .then((recipes) => {
+    res.json(recipes);
+  }, (err) => {
+    res.status(400).send(err);
+  });
 });
 
 app.get('/recipes/:id', (req, res) => {
-/*  var id = req.params.id;
+  var id = req.params.id;
   if(!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
-  Chef.findOne({_id: id})
-  .then((chef) => {
-    if(!chef) {
+  Recipe.findOne({_id: id}).populate('chef')
+  .then((recipe) => {
+    if(!recipe) {
       return res.status(404).send();
     }
-    res.send(chef);
+    res.send(recipe);
   })
   .catch((err) => {
     res.status(400).send();
   });
-  */
-  let recipe = {_id: '4244f', title : 'Tomato omelet', release : '2017', chef: 'Irina Slastunina', score: '10'};
-  recipe.chef = {name: 'Irina Slastunina', avatar: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/14192643_1793745170895027_262185511564817726_n.jpg?oh=0a042a72c075f5d1d258662ebfb0192c&oe=5AA3A5D7'}
-  res.json(recipe);
+
 });
+
 // implement the chefs API endpoints
 app.post('/chefs', (req, res) => {
 
@@ -265,7 +316,7 @@ app.patch('/chefs/:id', (req, res) => {
 
 });
 
-// launch backend server
+// launch  server
 app.listen(process.env.PORT, () => {
     console.log(`Started on port ${process.env.PORT}`);
 });
