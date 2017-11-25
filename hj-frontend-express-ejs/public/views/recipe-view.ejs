@@ -9,10 +9,12 @@
 
 <div class="jumbotron">
   <h2 class="display-3"><%=recipe.name%></h2>
-  <p class="lead"><img src="<%=recipe.chef.avatar%>" class="rounded-circle"/> <%=recipe.chef.name%>
+  <p class="lead">
+    Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef._id%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
   <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
-  <a class="btn btn-primary btn-sm" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a></p>
+  <a class="btn btn-primary btn-sm" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a>
   <% } %>
+  </p>
   <hr class="my-4">
 
   <p><%=recipe.description%></p>

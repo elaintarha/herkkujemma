@@ -5,6 +5,8 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const dateFormat = require('dateformat');
+const objectIdToTimestamp = require('objectid-to-timestamp');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const ensureUserLoggedIn = require('connect-ensure-login').ensureLoggedIn();
@@ -90,6 +92,13 @@ function getPublicAccessToken(req, res, next){
     }
 }
 
+function addDatesToRecipes(recipes) {
+
+  recipes.forEach(function(recipe) {
+    recipe.createdAt = dateFormat(objectIdToTimestamp(recipe._id), 'mediumDate');
+  });
+  return recipes;
+}
 // Public homepage without access control
 app.get('/', getPublicAccessToken, function(req, res){
 
@@ -100,7 +109,7 @@ app.get('/', getPublicAccessToken, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-        let recipes = data.body;
+        let recipes = addDatesToRecipes(data.body);
         res.render('index', {nav:'index', loggedIn: req.user, recipes: recipes} );
       }
     });
@@ -159,7 +168,7 @@ app.get('/recipes', getPublicAccessToken, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-        let recipes = data.body;
+        let recipes = addDatesToRecipes(data.body);
         res.render('recipes', {nav:'recipes', loggedIn: req.user, recipes: recipes} );
       }
     });
@@ -200,7 +209,8 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-      res.render('recipe-view', {nav:'recipes', loggedIn: req.user, recipe: data.body});
+        data.body.createdAt = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
+        res.render('recipe-view', {nav:'recipes', loggedIn: req.user, recipe: data.body});
       }
     })
 });
