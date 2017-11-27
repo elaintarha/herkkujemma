@@ -138,12 +138,14 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
       ingredients.push(ingredient);
     }
   }
+  let cookingTime = req.body.cookingTime;
+  let portions = req.body.portions;
 
   if(_id) {
     request
      .patch(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({_id, name, description, locale, ingredients})
+     .send({_id, name, description, cookingTime, portions, locale, ingredients})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
@@ -151,7 +153,7 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
     request
      .post(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({name, description, locale, ingredients})
+     .send({name, description, cookingTime, portions,  locale, ingredients})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });

@@ -7,41 +7,60 @@
 
 <%- include ./partials/header %>
 
-<div class="jumbotron">
-  <h2 class="display-3"><%=recipe.name%></h2>
-  <p class="lead">
-    Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef._id%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
-  <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
-  <a class="btn btn-primary btn-sm" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a>
-  <% } %>
-  </p>
-  <hr class="my-4">
-  <p><%=recipe.description%></p>
-  <h5 class="display-5">Ingredients</h5>
+  <div class="jumbotron">
+    <h2 class="display-3"><%=recipe.name%>
+      <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
+      <a class="btn btn-primary btn-lg" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a>
+      <% } %>
+    </h2>
+    <p class="lead">
+      Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef._id%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
+    </p>
+    <p class="lead"><em>&ldquo;<%=recipe.description%>&rdquo;</em></p>
+    <p class="lead">Time to cook:<strong><%=recipe.cookingTime%> mins.</strong> Portions:<strong><%=recipe.portions%></strong></p>
 
-  <table class="table table-sm table-hover table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">Ingredient</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Unit</th>
-    </tr>
-  </thead>
-  <tbody>
-   <%recipe.ingredients.forEach(function(ingredient, index) { %>
-    <tr>
-      <td><%=ingredient.title%></td>
-      <td><%=ingredient.quantity%></td>
-      <td><%=ingredient.unit%></td>
-    </tr>
-   <%})%>
-  </tbody>
-</table>
-</div>
+    <hr class="my-4">
 
+    <h5 class="display-5">Ingredients</h5>
 
+    <table class="table table-sm table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Ingredient</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+       <%recipe.ingredients.forEach(function(ingredient, index) { %>
+        <tr>
+          <td><%=ingredient.title%></td>
+          <td><%=ingredient.quantity%></td>
+          <td><%=ingredient.unit%></td>
+        </tr>
+       <%})%>
+      </tbody>
+    </table>
+
+    <hr class="my-4">
+
+    <h5 class="display-5">Instructions</h5>
+
+    <table class="table table-sm table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Step</th>
+          <th scope="col">Action</th>
+
+        </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
 
   </div>
+
 </div>
 
 </body>
