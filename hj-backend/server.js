@@ -150,6 +150,53 @@ app.post('/recipes', (req, res) => {
 
 });
 
+app.delete('/recipes', (req, res) => {
+
+
+    var body = _.pick(req.body, ['_id', 'chef']);
+
+    let chefIdField = '_id';
+    let chefIdValue = body.chef;
+    // use the identity from auth0 in prod
+    if(req.user && req.user.sub) {
+      chefIdField = 'sub';
+      chefIdValue = req.user.sub;
+    }
+
+    if(chefIdField == '_id' && !ObjectID.isValid(body.chef)) {
+      return res.status(400).send();
+    }
+
+    let chef;
+    let recipe;
+    Chef.findOne({[chefIdField]: chefIdValue})
+    .then((chefDb) => {
+      if(!chefDb) {
+        return res.status(400).send();
+      }
+      chef = chefDb;
+      return Recipe.findOneAndRemove({_id: body._id, chef:chefDb});
+    }, (err) => {
+        return res.status(400).send(err.message);
+    })
+    .then((recipeDb) => {
+      if(!recipeDb) {
+        throw 'Recipe was not found';
+      }
+      recipe = recipeDb;
+      let recipeRef = chef.recipes.find(o => o._id.toHexString() === recipeDb._id.toHexString());
+      chef.recipes.pull(recipeRef);
+      return chef.save();
+    })
+    .then((chefDb2) => {
+      return res.status(200).send(recipe);
+    })
+    .catch((err) => {
+      console.log('Error deleting recipe', err);
+      res.status(400).send(err.message);
+    });
+});
+
 app.patch('/recipes', (req, res) => {
 
   var body = _.pick(req.body, ['_id', 'name', 'description', 'chef', 'locale', 'ingredients']);

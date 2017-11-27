@@ -11,7 +11,7 @@ const {chefs,recipes,populateChefs,populateRecipes} = require ('./seed/seed');
 beforeEach(populateChefs);
 beforeEach(populateRecipes);
 
-describe('POST /recipe', () => {
+describe('POST /recipes', () => {
   it('should create a recipe stub', (done) => {
 
     var name = 'Delicious test meal';
@@ -63,7 +63,7 @@ describe('POST /recipe', () => {
   });
 });
 
-describe('PATCH /recipe', () => {
+describe('PATCH /recipes', () => {
   it('should update a recipe stub', (done) => {
 
     var _id = recipes[0]._id;
@@ -122,10 +122,58 @@ describe('PATCH /recipe', () => {
           expect(recipe.name).not.toBe(name);
           expect(recipe.description).not.toBe(description);
           expect(recipe.chef._id).not.toEqual(chefs[0]._id);
-          expect(recipe.chef.name).not.toBe(chefs[0].name);          
+          expect(recipe.chef.name).not.toBe(chefs[0].name);
+          done();
+        }).catch((err) => done(err));
+      });
+  });
+});
+
+describe('DELETE /recipes', () => {
+  it('should delete specified recipe', (done) => {
+
+    var _id = recipes[0]._id;
+    var chef = chefs[1]._id.toHexString();
+
+    request(app)
+      .delete('/recipes')
+      .send({_id, chef})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body._id).toBeTruthy();
+        expect(res.body._id).toBe(_id.toHexString());
+      })
+      .end((err) => {
+        if(err) {
+          return done(err);
+        }
+        Recipe.findOne({_id}).populate('chef').then((recipe) => {
+          expect(recipe).toBeFalsy();
           done();
         }).catch((err) => done(err));
       });
   });
 
+  it('should not delete other users recipe', (done) => {
+
+    var _id = recipes[0]._id;
+    var chef = chefs[0]._id.toHexString();
+
+    request(app)
+      .delete('/recipes')
+      .send({_id, chef})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body._id).toBeFalsy();
+      })
+      .end((err) => {
+        if(err) {
+          return done(err);
+        }
+        Recipe.findOne({_id}).populate('chef').then((recipe) => {
+          expect(recipe).toBeTruthy();
+          done();
+        }).catch((err) => done(err));
+      });
+  });
 });
