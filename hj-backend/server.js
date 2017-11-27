@@ -105,7 +105,7 @@ if(process.env.NODE_ENV != 'test') {
 // implement the recipes API endpoints
 app.post('/recipes', (req, res) => {
 
-  var body = _.pick(req.body, ['name', 'description', 'chef', 'locale']);
+  var body = _.pick(req.body, ['name', 'description', 'chef', 'locale', 'ingredients']);
 
   let chefIdField = '_id';
   let chefIdValue = body.chef;
@@ -152,7 +152,7 @@ app.post('/recipes', (req, res) => {
 
 app.patch('/recipes', (req, res) => {
 
-  var body = _.pick(req.body, ['_id', 'name', 'description', 'chef', 'locale']);
+  var body = _.pick(req.body, ['_id', 'name', 'description', 'chef', 'locale', 'ingredients']);
 
   let chefIdField = '_id';
   let chefIdValue = body.chef;
@@ -189,6 +189,7 @@ app.patch('/recipes', (req, res) => {
     recipeDb.name = body.name;
     recipeDb.description = body.description;
     recipeDb.locale = body.locale;
+    recipeDb.ingredients = body.ingredients;
     return recipeDb.save();
   })
   .then((recipeDb2) => {

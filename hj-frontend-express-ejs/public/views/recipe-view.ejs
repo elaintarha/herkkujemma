@@ -16,13 +16,27 @@
   <% } %>
   </p>
   <hr class="my-4">
-
   <p><%=recipe.description%></p>
-  <!--
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-  </p>
--->
+  <h5 class="display-5">Ingredients</h5>
+
+  <table class="table table-sm table-hover table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Ingredient</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+   <%recipe.ingredients.forEach(function(ingredient, index) { %>
+    <tr>
+      <td><%=ingredient.title%></td>
+      <td><%=ingredient.quantity%></td>
+      <td><%=ingredient.unit%></td>
+    </tr>
+   <%})%>
+  </tbody>
+</table>
 </div>
 
 

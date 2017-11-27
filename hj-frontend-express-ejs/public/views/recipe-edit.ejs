@@ -38,6 +38,51 @@
           <option <%if(recipe.locale == 'fi') {%>selected<% } %>>fi</option>
         </select>
       </div>
+
+      <h5 class="display-5">Ingredients</h5>
+      <div class="controls">
+       <% if(recipe.ingredients && recipe.ingredients.length>0) {
+         recipe.ingredients.forEach(function(ingredient, index) { %>
+          <div class="form-row align-items-left mb-2">
+            <div class="col-sm-4">
+              <label class="sr-only" for="inlineFormInputTitle">Name</label>
+              <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputTitle" name="ingredients.title[]" placeholder="Ingredient" value="<%=ingredient.title%>">
+            </div>
+            <div class="col-sm-2">
+              <label class="sr-only" for="inlineFormInputQuantity">Quantity</label>
+              <input type="text" class="form-control" id="inlineFormInputQuantity" name="ingredients.quantity[]" placeholder="Quantity" value="<%=ingredient.quantity%>">
+            </div>
+            <div class="col-sm-2">
+              <label class="sr-only" for="inlineFormInputUnit">Unit</label>
+              <input type="text" class="form-control" id="inlineFormInputUnit" name="ingredients.unit[]" placeholder="Unit" value="<%=ingredient.unit%>">
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-remove btn-danger"><span class="fa fa-minus"></span></button>
+            </div>
+          </div>
+
+        <%}); }%>
+
+      <div class="form-row align-items-left mb-2">
+        <div class="col-sm-4">
+          <label class="sr-only" for="inlineFormInputTitle">Name</label>
+          <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputTitle" name="ingredients.title[]" placeholder="Ingredient">
+        </div>
+        <div class="col-sm-2">
+          <label class="sr-only" for="inlineFormInputQuantity">Quantity</label>
+          <input type="text" class="form-control" id="inlineFormInputQuantity" name="ingredients.quantity[]" placeholder="Quantity">
+        </div>
+        <div class="col-sm-2">
+          <label class="sr-only" for="inlineFormInputUnit">Unit</label>
+          <input type="text" class="form-control" id="inlineFormInputUnit" name="ingredients.unit[]" placeholder="Unit">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-add"><i class="fa fa-plus"></i></button>
+        </div>
+      </div>
+</div>
+      <hr class="my-4">
+
       <%if(recipe._id) {%>
         <input type="hidden" name="_id" value="<%= recipe._id %>" />
       <% } %>
@@ -48,6 +93,32 @@
     </div>
 
   </div>
+<script>
+$(function()
+{
+    $(document).on('click', '.btn-add', function(e)
+    {
+        e.preventDefault();
 
+        var controlForm = $('.controls'),
+            currentEntry = $(this).parents('.form-row:first'),
+            newEntry = $(currentEntry.clone());
+            newEntry.appendTo(controlForm);
+
+        newEntry.find('input').val('');
+        controlForm.find('.form-row:not(:last) .btn-add')
+            .removeClass('btn-add').addClass('btn-remove')
+            .removeClass('btn-success').addClass('btn-danger')
+            .html('<span class="fa fa-minus"></span>');
+    }).on('click', '.btn-remove', function(e)
+    {
+		$(this).parents('.form-row:first').remove();
+
+		e.preventDefault();
+		return false;
+	});
+});
+
+</script>
 </body>
 </html>

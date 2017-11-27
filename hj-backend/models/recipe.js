@@ -5,6 +5,7 @@ var RecipeSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true,
     minlength: 3
   },
   description: {
@@ -14,10 +15,11 @@ var RecipeSchema = new mongoose.Schema({
   },
   chef: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Chef' 
+    ref: 'Chef'
   },
   locale: {
     type: String,
+    trim: true,
     required: true
   },
   updatedAt: {
@@ -25,15 +27,18 @@ var RecipeSchema = new mongoose.Schema({
     default: null
   },
   ingredients: [{
-    name: {
+    title: {
       type: String,
+      trim: true,
       require: true
     },
     quantity: {
-      type: String
+      type: String,
+      trim: true
     },
     unit: {
-      type: String
+      type: String,
+      trim: true
     }
   }],
   instructions: [{
@@ -42,12 +47,14 @@ var RecipeSchema = new mongoose.Schema({
       require: true
     },
     description: {
-      type: String
+      type: String,
+      trim: true
     }
   }],
   pictures: [{
     url: {
       type: String,
+      trim: true,
       require: true
     }
   }]

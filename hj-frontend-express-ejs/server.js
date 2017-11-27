@@ -32,7 +32,7 @@ const app = express();
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // @todo conf session store
@@ -129,11 +129,21 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
   let locale = req.body.locale;
   let _id = req.body._id;
 
+  let ingredients = [];
+  for(var i=0;i<req.body["ingredients.title"].length;i++) {
+    let ingredient = { title: req.body["ingredients.title"][i],
+                       quantity: req.body["ingredients.quantity"][i],
+                       unit: req.body["ingredients.unit"][i] };
+    if(ingredient.title && ingredient.title.length>0) {
+      ingredients.push(ingredient);
+    }
+  }
+
   if(_id) {
     request
      .patch(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({_id, name, description, locale})
+     .send({_id, name, description, locale, ingredients})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
@@ -141,11 +151,13 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
     request
      .post(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({name, description, locale})
+     .send({name, description, locale, ingredients})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
   }
+
+
 });
 
 function handlePostRecipeResult(req, res, err, data) {
