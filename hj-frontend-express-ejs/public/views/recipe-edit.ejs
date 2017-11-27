@@ -87,7 +87,10 @@
         <input type="hidden" name="_id" value="<%= recipe._id %>" />
       <% } %>
       <p class="lead">
-        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>
+        <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
+        <a class="btn btn-danger btn-block" href="/recipes/delete/<%=recipe._id%>" role="button">Delete</a>
+        <% } %>
       </p>
     </form>
     </div>

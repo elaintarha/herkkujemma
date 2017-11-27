@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <%- include ./partials/head %>
+</head>
+<body>
+
+<%- include ./partials/header %>
+
+<div class="jumbotron">
+  <h2 class="display-3"><span class="fa fa-remove"> Confirm recipe delete</span></h2>
+  <p class="lead">
+    Once you hit delete your nice recipe cannot be recovered!
+  </p>
+  <hr class="my-4">
+  <p>
+    <a class="btn btn-primary btn-block " href="/recipes/edit/<%=recipeId%>" role="button">Go back</a>
+    <% if(loggedIn) { %>
+    <form action="/recipes/delete" method="POST">
+      <input type="hidden" name="recipeId" value="<%=recipeId%>"/>
+      <button type="submit" class="btn btm-primary btn-danger btn-block" role="button">Delete</button>
+    </form>
+    <% } %>
+  </p>
+
+</div>
+
+
+
+  </div>
+</div>
+
+</body>
+</html>

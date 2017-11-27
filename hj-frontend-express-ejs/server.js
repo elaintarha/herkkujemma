@@ -156,8 +156,6 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
        return handlePostRecipeResult(req, res, err, data);
      });
   }
-
-
 });
 
 function handlePostRecipeResult(req, res, err, data) {
@@ -209,6 +207,30 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res){
     })
 });
 
+app.get('/recipes/delete/:id', ensureUserLoggedIn, function(req, res){
+  let errorMessage = req.query.err
+  res.render('recipe-delete', {nav:'recipes', loggedIn: req.user, recipeId: req.params.id});
+});
+
+app.post('/recipes/delete', ensureUserLoggedIn, function(req, res){
+
+  let _id = req.body.recipeId;
+
+  request
+     .delete(process.env.BACKEND + '/recipes')
+     .set('Authorization', 'Bearer ' + req.user.accessToken)
+     .send({_id})
+     .end(function(err, data) {
+       if(data.status == 403){
+         res.send(403, '403 Forbidden');
+       } else {
+         if(!data.body._id) {
+           return res.status(404).send("Sorry can't find that!");
+         }
+         res.redirect('/chefs/me');
+       }
+     });
+});
 
 app.get('/recipes/:id', getPublicAccessToken, function(req, res){
 
@@ -219,8 +241,11 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res){
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
       if(data.status == 403){
-        res.send(403, '403 Forbidden');
+        return res.send(403, '403 Forbidden');
       } else {
+        if(!data.body._id) {
+          return res.status(404).send("Sorry can't find that!");
+        }
         data.body.createdAt = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
         res.render('recipe-view', {nav:'recipes', loggedIn: req.user, recipe: data.body});
       }
@@ -305,6 +330,9 @@ app.get('/chefs/:id', getPublicAccessToken, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
+        if(!data.body._id) {
+          return res.status(404).send("Sorry can't find that!");
+        }
       res.render('chef', {nav:'chefs', loggedIn: req.user, chef: data.body});
       }
     })
@@ -352,6 +380,7 @@ app.get('/failure', function(req, res) {
     error_description: error_description[0],
   });
 });
+
 
 // launch the frontend server
 app.listen(process.env.PORT, () => {
