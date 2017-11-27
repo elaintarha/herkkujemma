@@ -22,6 +22,14 @@ var RecipeSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
+  cookingTime: {
+    type: String,
+    trim: true
+  },
+  portions: {
+    type: String,
+    trim: true
+  },  
   updatedAt: {
     type: Number,
     default: null
