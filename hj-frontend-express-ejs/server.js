@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const dateFormat = require('dateformat');
 const objectIdToTimestamp = require('objectid-to-timestamp');
 const dotenv = require('dotenv');
@@ -34,13 +35,19 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// set the directory to serve static assets
+app.use(express.static(__dirname + '/public'));
 
 // @todo conf session store
 app.use(
   session({
-    secret: 'shhhhhhhhh2',
+    store: new FileStore(
+      {path: '../data-hj-ejs/sessions',
+      ttl: 3600,
+      reapInterval: 3600}),
+    secret: 'shhhhhhhh22',
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: false
   })
 );
 app.use(passport.initialize());
@@ -49,9 +56,6 @@ app.use(passport.session());
 // set the view engine to use EJS and the default views directory
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/public/views/');
-
-// set the directory to serve static assets
-app.use(express.static(__dirname + '/public'));
 
 // force all logged in users without saved profile to signup
 app.use((req, res, next) => {
