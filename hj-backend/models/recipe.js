@@ -29,7 +29,7 @@ var RecipeSchema = new mongoose.Schema({
   portions: {
     type: String,
     trim: true
-  },  
+  },
   updatedAt: {
     type: Number,
     default: null
@@ -50,10 +50,6 @@ var RecipeSchema = new mongoose.Schema({
     }
   }],
   instructions: [{
-    step: {
-      type: Number,
-      require: true
-    },
     description: {
       type: String,
       trim: true

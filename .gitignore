@@ -24,5 +24,4 @@ playground/
 # Secrets config file, use config.json.example to create your own
 config.json
 server-config.js
-
 .env

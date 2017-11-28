@@ -99,13 +99,28 @@
     <h5 class="display-5">Instructions</h5>
 
     <div class="ins-controls">
+    <% if(recipe.instructions && recipe.instructions.length>0) {
+      recipe.instructions.forEach(function(instruction, index) { %>
+        <div class="form-row align-items-left mb-2">
+          <div class="col">
+            <label class="sr-only" for="inlineFormInputDescription">Cooking step</label>
+            <input type="text" class="form-control" id="inlineFormInputDescription" name="instructions.description[]"
+            value="<%=instruction.description%>" placeholder="Describe what to do in steps">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-remove btn-danger"><i class="fa fa-minus"></i></button>
+          </div>
+        </div>
+
+    <%}); }%>
+
       <div class="form-row align-items-left mb-2">
         <div class="col">
           <label class="sr-only" for="inlineFormInputDescription">Cooking step</label>
           <input type="text" class="form-control" id="inlineFormInputDescription" name="instructions.description[]" placeholder="Describe what to do in steps">
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-add disabled"><i class="fa fa-plus"></i></button>
+          <button type="submit" class="btn btn-add2"><i class="fa fa-plus"></i></button>
         </div>
       </div>
     </div>
@@ -148,6 +163,28 @@ $(function()
 		e.preventDefault();
 		return false;
 	});
+
+  $(document).on('click', '.btn-add2', function(e)
+  {
+      e.preventDefault();
+
+      var controlForm = $('.ins-controls'),
+          currentEntry = $(this).parents('.form-row:first'),
+          newEntry = $(currentEntry.clone());
+          newEntry.appendTo(controlForm);
+
+      newEntry.find('input').val('');
+      controlForm.find('.form-row:not(:last) .btn-add2')
+          .removeClass('btn-add2').addClass('btn-remove')
+          .removeClass('btn-success').addClass('btn-danger')
+          .html('<span class="fa fa-minus"></span>');
+  }).on('click', '.btn-remove', function(e)
+  {
+  $(this).parents('.form-row:first').remove();
+
+  e.preventDefault();
+  return false;
+});
 });
 
 </script>

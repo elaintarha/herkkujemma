@@ -124,10 +124,13 @@ app.get('/about', function(req, res){
 // superagent does the handling of backend request
 app.post('/recipes', ensureUserLoggedIn, function(req, res){
 
+  let _id = req.body._id;
+
   let name = req.body.name;
   let description = req.body.description;
   let locale = req.body.locale;
-  let _id = req.body._id;
+  let cookingTime = req.body.cookingTime;
+  let portions = req.body.portions;
 
   let ingredients = [];
   for(var i=0;i<req.body["ingredients.title"].length;i++) {
@@ -138,14 +141,20 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
       ingredients.push(ingredient);
     }
   }
-  let cookingTime = req.body.cookingTime;
-  let portions = req.body.portions;
+
+  let instructions = [];
+  for(var i=0;i<req.body["instructions.description"].length;i++) {
+    let instruction = { description: req.body["instructions.description"][i] };
+    if(instruction.description && instruction.description.length>0) {
+      instructions.push(instruction);
+    }
+  }
 
   if(_id) {
     request
      .patch(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({_id, name, description, cookingTime, portions, locale, ingredients})
+     .send({_id, name, description, cookingTime, portions, locale, ingredients, instructions})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
@@ -153,7 +162,7 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
     request
      .post(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({name, description, cookingTime, portions,  locale, ingredients})
+     .send({name, description, cookingTime, portions,  locale, ingredients, instructions})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });

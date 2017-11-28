@@ -51,11 +51,15 @@
         <tr>
           <th scope="col">Step</th>
           <th scope="col">Action</th>
-
         </tr>
       </thead>
       <tbody>
-
+        <%recipe.instructions.forEach(function(instruction, index) { %>
+         <tr>
+           <td><%=index+1%></td>
+           <td><%=instruction.description%></td>
+         </tr>
+        <%})%>
       </tbody>
     </table>
 
