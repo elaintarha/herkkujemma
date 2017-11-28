@@ -8,17 +8,19 @@
 <%- include ./partials/header %>
 
   <div class="jumbotron">
+    <p class="lead">
+      Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef.shortId%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
+    </p>
     <h2 class="display-3"><%=recipe.name%>
       <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
       <a class="btn btn-primary btn-lg" href="/recipes/edit/<%=recipe.shortId%>" role="button">Edit</a>
       <% } %>
     </h2>
-    <p class="lead">
-      Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef.shortId%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
-    </p>
     <p class="lead"><em>&ldquo;<%=recipe.description%>&rdquo;</em></p>
+    <%if (recipe.pictureUrl) { %>
+     <img class="img-fluid" src="<%=imageServer%>/hj-recipes/<%=recipe.pictureUrl%>"/>
+    <% } %>
     <p class="lead">Time to cook:<strong><%=recipe.cookingTime%> mins.</strong> Portions:<strong><%=recipe.portions%></strong></p>
-
     <hr class="my-4">
 
     <h5 class="display-5">Ingredients</h5>

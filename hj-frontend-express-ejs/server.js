@@ -12,10 +12,18 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const ensureUserLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 
+const multer  = require('multer');
+var storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+const sharp = require('sharp');
+/* multer({ dest: '../data-hj-ejs/uploads/' }) */
+
 dotenv.load();
 
 // load auth configs
 const {serverAuth,userStrategy,userAuthParams} = require('./auth/auth.js');
+// load s3 image storage
+const {s3} = require('./aws/s3.js');
 
 let cachedServerAuthToken;
 let cachedServerAuthTokenTTL = 0;
@@ -34,6 +42,9 @@ app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// aws image server baseurl
+app.locals.imageServer = process.env.AWS_URL;
 
 // set the directory to serve static assets
 app.use(express.static(__dirname + '/public'));
@@ -124,11 +135,63 @@ app.get('/about', function(req, res){
   res.render('about', {nav:'about', loggedIn: req.user});
 });
 
+function savePictureToS3(type, file) {
+
+  let bucketKey = 'hj-recipes';
+  let filePrefix = 'r';
+
+  if(type && type === 'chef') {
+    bucketKey = 'hj-chefs'
+    filePrefix = 'c';
+  }
+
+  let fileName = filePrefix + new Date().getTime() + '.jpg';
+
+  sharp(file)
+  .resize(800, 800)
+  .max()
+  .toFormat('jpeg')
+  .toBuffer()
+  .then(function(data) {
+
+      var params = {Bucket: bucketKey, Key: fileName, Body: data, ACL: 'public-read'};
+
+      var result = s3.upload(params, function(err, data) {
+        if (err) {
+           console.log(err, err.stack); // an error occurred
+           return null;
+        }
+    });
+  });
+  return fileName;
+};
+
+function delPictureFromS3(type, fileName) {
+
+  let bucketKey = 'hj-recipes';
+
+  if(type && type === 'chef') {
+    bucketKey = 'hj-chefs'
+  }
+
+  var params = {Bucket: bucketKey, Key: fileName};
+
+  var result = s3.deleteObject(params, function(err, data) {
+    if (err) {
+      console.log(err, err.stack); // an error occurred
+    }
+  });
+};
+
 // get token, add it to request header, get data and render it or deny
 // superagent does the handling of backend request
-app.post('/recipes', ensureUserLoggedIn, function(req, res){
+app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(req, res){
 
-  let _id = req.body._id;
+  let pictureUrl = null;
+  if(req.file) {
+    pictureUrl = savePictureToS3('recipe',req.file.buffer);
+  }
+  let shortId = req.body.shortId;
 
   let name = req.body.name;
   let description = req.body.description;
@@ -154,11 +217,11 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
     }
   }
 
-  if(_id) {
+  if(shortId) {
     request
      .patch(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({_id, name, description, cookingTime, portions, locale, ingredients, instructions})
+     .send({shortId, name, description, cookingTime, portions, locale, ingredients, instructions, pictureUrl})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
@@ -166,7 +229,7 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
     request
      .post(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({name, description, cookingTime, portions,  locale, ingredients, instructions})
+     .send({name, description, cookingTime, portions,  locale, ingredients, instructions, pictureUrl})
      .end(function(err, data) {
        return handlePostRecipeResult(req, res, err, data);
      });
@@ -175,12 +238,15 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
 
 function handlePostRecipeResult(req, res, err, data) {
   if(data.status == 200){
-    res.redirect('/recipes/'+data.body.shortId);
+    if(data.body.pictureToDelete) {
+      delPictureFromS3('recipe', data.body.pictureToDelete);
+    }
+    res.redirect('/recipes/'+data.body.recipe.shortId);
   } else {
-    if(req.body._id) {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: req.body, errorMessage: err.response.text});
+    if(data.body.recipe && data.body.recipe._id) {
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: data.body.recipe, errorMessage: err.response.text});
     } else {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Add', recipe: req.body, errorMessage: err.response.text});
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Add', recipe: data.body.recipe, errorMessage: err.response.text});
     }
   }
 }
@@ -217,7 +283,9 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-        res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: data.body, errorMessage: errorMessage});
+        res.render('recipe-edit', {nav:'recipes',
+        loggedIn: req.user, title: 'Edit', recipe: data.body,
+        errorMessage: errorMessage});
       }
     })
 });
@@ -239,8 +307,11 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res){
        if(data.status == 403){
          res.send(403, '403 Forbidden');
        } else {
-         if(!data.body._id) {
+         if(!data.body.recipe._id) {
            return res.status(404).send("Sorry can't find that!");
+         }
+         if(data.body.pictureToDelete) {
+           delPictureFromS3('recipe', data.body.pictureToDelete);
          }
          res.redirect('/chefs/me');
        }
