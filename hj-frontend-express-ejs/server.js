@@ -54,7 +54,7 @@ app.use(
   session({
     store: new FileStore(
       {path: '../data-hj-ejs/sessions',
-      ttl: 3600,
+      ttl: (24*3600),
       reapInterval: 3600}),
     secret: 'shhhhhhhh22',
     resave: true,
