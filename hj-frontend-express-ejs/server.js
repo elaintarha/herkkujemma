@@ -171,7 +171,7 @@ app.post('/recipes', ensureUserLoggedIn, function(req, res){
 
 function handlePostRecipeResult(req, res, err, data) {
   if(data.status == 200){
-    res.redirect('/recipes/'+data.body._id);
+    res.redirect('/recipes/'+data.body.shortId);
   } else {
     if(req.body._id) {
       res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: req.body, errorMessage: err.response.text});
@@ -220,17 +220,17 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res){
 
 app.get('/recipes/delete/:id', ensureUserLoggedIn, function(req, res){
   let errorMessage = req.query.err
-  res.render('recipe-delete', {nav:'recipes', loggedIn: req.user, recipeId: req.params.id});
+  res.render('recipe-delete', {nav:'recipes', loggedIn: req.user, shortId: req.params.id});
 });
 
 app.post('/recipes/delete', ensureUserLoggedIn, function(req, res){
 
-  let _id = req.body.recipeId;
+  let shortId = req.body.shortId;
 
   request
      .delete(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({_id})
+     .send({shortId})
      .end(function(err, data) {
        if(data.status == 403){
          res.send(403, '403 Forbidden');

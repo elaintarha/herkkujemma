@@ -14,10 +14,10 @@
   </p>
   <hr class="my-4">
   <p>
-    <a class="btn btn-primary btn-block " href="/recipes/edit/<%=recipeId%>" role="button">Go back</a>
+    <a class="btn btn-primary btn-block " href="/recipes/edit/<%=shortId%>" role="button">Go back</a>
     <% if(loggedIn) { %>
     <form action="/recipes/delete" method="POST">
-      <input type="hidden" name="recipeId" value="<%=recipeId%>"/>
+      <input type="hidden" name="shortId" value="<%=shortId%>"/>
       <button type="submit" class="btn btm-primary btn-danger btn-block" role="button">Delete</button>
     </form>
     <% } %>

@@ -127,12 +127,12 @@
     <hr class="my-4">
 
       <%if(recipe._id) {%>
-        <input type="hidden" name="_id" value="<%= recipe._id %>" />
+        <input type="hidden" name="shortId" value="<%= recipe.shortId %>" />
       <% } %>
       <p class="lead">
         <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>
-        <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
-        <a class="btn btn-danger btn-block" href="/recipes/delete/<%=recipe._id%>" role="button">Delete</a>
+        <% if((loggedIn && recipe.chef) && recipe.chef.sub === loggedIn._json.sub) { %>
+        <a class="btn btn-danger btn-block" href="/recipes/delete/<%=recipe.shortId%>" role="button">Delete</a>
         <% } %>
       </p>
     </form>

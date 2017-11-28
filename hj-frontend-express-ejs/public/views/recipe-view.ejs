@@ -10,11 +10,11 @@
   <div class="jumbotron">
     <h2 class="display-3"><%=recipe.name%>
       <% if(loggedIn && recipe.chef.sub === loggedIn._json.sub) { %>
-      <a class="btn btn-primary btn-lg" href="/recipes/edit/<%=recipe._id%>" role="button">Edit</a>
+      <a class="btn btn-primary btn-lg" href="/recipes/edit/<%=recipe.shortId%>" role="button">Edit</a>
       <% } %>
     </h2>
     <p class="lead">
-      Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef._id%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
+      Created on <%=recipe.createdAt%> by <a href="/chefs/<%=recipe.chef.shortId%>"><%=recipe.chef.name%></a> <img src="<%=recipe.chef.avatar%>" class="rounded-circle"/>
     </p>
     <p class="lead"><em>&ldquo;<%=recipe.description%>&rdquo;</em></p>
     <p class="lead">Time to cook:<strong><%=recipe.cookingTime%> mins.</strong> Portions:<strong><%=recipe.portions%></strong></p>
