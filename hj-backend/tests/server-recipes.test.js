@@ -92,6 +92,7 @@ describe('PATCH /recipes', () => {
           expect(recipe.chef._id).toEqual(chefs[1]._id);
           expect(recipe.chef.name).not.toBe(chefs[0].name);
           expect(recipe.locale).toBe(chefs[0].locale);
+          
           done();
         }).catch((err) => done(err));
       });

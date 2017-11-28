@@ -6,6 +6,7 @@ const {Recipe} = require('./../../models/recipe');
 const chefOneId = new ObjectID();
 const chefTwoId = new ObjectID();
 const recipeOneId = new ObjectID();
+const recipeOneShortId = shortId.generate();
 
 const chefs = [{
   _id: chefOneId,
@@ -25,13 +26,14 @@ const chefs = [{
   avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/14192643_1793745170895027_262185511564817726_n.jpg?oh=2a03ab82a6f35262b965ed99d46541a3&oe=5A43C046',
   recipes: [{
     _id: recipeOneId,
-    name: 'Chicken korma'
+    name: 'Chicken korma',
+    shortId: recipeOneShortId
   }]
 }];
 
 const recipes = [{
   _id: recipeOneId,
-  shortId: shortId.generate(),
+  shortId: recipeOneShortId,
   name: 'Chicken korma',
   description: 'Delicious butter chicken',
   chef: chefTwoId,
