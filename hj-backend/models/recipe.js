@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const shortId = require('shortid');
 
 var RecipeSchema = new mongoose.Schema({
+  shortId: {
+    type: String,
+    unique: true,
+    default: shortId.generate
+  },
   name: {
     type: String,
     required: true,

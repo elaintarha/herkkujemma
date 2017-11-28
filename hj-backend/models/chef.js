@@ -1,8 +1,14 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const shortId = require('shortid');
 const uniqueValidator = require('mongoose-unique-validator');
 
 var ChefSchema = new mongoose.Schema({
+  shortId: {
+    type: String,
+    unique: true,
+    default: shortId.generate
+  },
   email: {
     type: String,
     required: true,

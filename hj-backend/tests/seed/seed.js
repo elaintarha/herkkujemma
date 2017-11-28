@@ -1,5 +1,5 @@
 const {ObjectID} = require('mongodb');
-
+const shortId = require('shortid');
 const {Chef} = require('./../../models/chef');
 const {Recipe} = require('./../../models/recipe');
 
@@ -9,6 +9,7 @@ const recipeOneId = new ObjectID();
 
 const chefs = [{
   _id: chefOneId,
+  shortId: shortId.generate(),
   email: 'yksi@example.com',
   sub: 'auth0|110619335603014859742',
   name: 'Irina Saari',
@@ -16,6 +17,7 @@ const chefs = [{
   avatar: 'https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-1/p160x160/19224792_10214266332516057_4019139626130681417_n.jpg?oh=1df9b153dcd91cb0941bad99eee7d911&oe=5A7AE8B5'
 },{
   _id: chefTwoId,
+  shortId: shortId.generate(),
   email: 'kaksi@example.com',
   name: 'Jaakko Saari',
   sub: 'google-oauth2|110619335603014859742',
@@ -29,6 +31,7 @@ const chefs = [{
 
 const recipes = [{
   _id: recipeOneId,
+  shortId: shortId.generate(),
   name: 'Chicken korma',
   description: 'Delicious butter chicken',
   chef: chefTwoId,

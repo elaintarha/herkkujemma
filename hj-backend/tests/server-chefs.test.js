@@ -1,7 +1,7 @@
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
-
+const shortId = require('shortid');
 const {app} = require('./../server');
 const {Chef} = require('./../models/chef');
 
@@ -22,6 +22,7 @@ describe('POST /chef', () => {
       .expect(200)
       .expect((res) => {
         expect(res.body._id).toBeTruthy();
+        expect(res.body.shortId).toBeTruthy();
         expect(res.body.email).toBe(email);
       })
       .end((err) => {
@@ -72,24 +73,15 @@ describe('GET /chefs/:id', () => {
   it('should return specified chef', (done) => {
 
     request(app)
-      .get(`/chefs/${chefs[1]._id.toHexString()}`)
+      .get(`/chefs/${chefs[1].shortId}`)
       .expect(200)
-      .expect((res) => {        
+      .expect((res) => {
         expect(res.body.email).toBe(chefs[1].email);
       })
       .end(done);
   });
   it('should return 404 if chef not found', (done) => {
-    var id = new ObjectID().toHexString();
-
-    request(app)
-      .get(`/chefs/${id}`)
-      .expect(404)
-      .end(done);
-  });
-  it('should return 404 for non-object id', (done) => {
-    var id = new ObjectID();
-    id = 'h' + chefs[0]._id.toHexString();
+    var id = shortId.generate();
 
     request(app)
       .get(`/chefs/${id}`)
@@ -100,14 +92,15 @@ describe('GET /chefs/:id', () => {
 
 describe('PATCH /chefs/:id', () => {
   it('should update the mutable chef fields', (done ) => {
-    var id = chefs[0]._id.toHexString();
+    var shortId = chefs[0].shortId;
+    var objectID = chefs[0]._id;
     var name = 'New Name';
     var avatar = 'some url';
     var locale = 'jp-JP';
     var email = 'crook@example.com';
 
     request(app)
-      .patch(`/chefs/${id}`)
+      .patch(`/chefs/${shortId}`)
       .send({name,avatar,locale,email})
       .expect(200)
       .expect((res) => {
@@ -121,7 +114,7 @@ describe('PATCH /chefs/:id', () => {
         if(err) {
           return done(err);
         }
-        Chef.findById(id).then((chef) => {
+        Chef.findById(objectID).then((chef) => {
           expect(chef.name).not.toBe(chefs[0].name);
           expect(chef.avatar).not.toBe(chefs[0].avatar);
           expect(chef.locale).not.toBe(chefs[0].locale);
@@ -132,24 +125,14 @@ describe('PATCH /chefs/:id', () => {
   });
 
   it('should return 404 if chef not found', (done) => {
-    var id = new ObjectID().toHexString();
+    var shortId = '34343432';
     var name = 'New Name';
 
     request(app)
-      .patch(`/chefs/${id}`)
+      .patch(`/chefs/${shortId}`)
       .send({name})
       .expect(404)
       .end(done);
   });
-  it('should return 404 for non-object id', (done) => {
-    var id = new ObjectID();
-    id = 'h' + chefs[0]._id.toHexString();
-    var name = 'New Name';
 
-    request(app)
-      .patch(`/chefs/${id}`)
-      .send({name})
-      .expect(404)
-      .end(done);
-  });
 });

@@ -66,7 +66,7 @@ describe('POST /recipes', () => {
 describe('PATCH /recipes', () => {
   it('should update a recipe stub', (done) => {
 
-    var _id = recipes[0]._id;
+    var shortId = recipes[0].shortId;
 
     var name = 'Delicious test meal';
     var description = 'Deliciously cooked meal for testing';
@@ -75,7 +75,7 @@ describe('PATCH /recipes', () => {
 
     request(app)
       .patch('/recipes')
-      .send({_id, name, description, chef, locale})
+      .send({shortId, name, description, chef, locale})
       .expect(200)
       .expect((res) => {
         expect(res.body._id).toBeTruthy();
@@ -99,7 +99,7 @@ describe('PATCH /recipes', () => {
 
   it('should not update other users recipe', (done) => {
 
-    var _id = recipes[0]._id;
+    var shortId = recipes[0].shortId;
 
     var name = 'Delicious test meal';
     var description = 'Deliciously cooked meal for testing';
@@ -108,7 +108,7 @@ describe('PATCH /recipes', () => {
 
     request(app)
       .patch('/recipes')
-      .send({_id, name, description, chef, locale})
+      .send({shortId, name, description, chef, locale})
       .expect(400)
       .expect((res) => {
         expect(res.body._id).toBeFalsy();
@@ -117,7 +117,7 @@ describe('PATCH /recipes', () => {
         if(err) {
           return done(err);
         }
-        Recipe.findOne({_id}).populate('chef').then((recipe) => {
+        Recipe.findOne({shortId}).populate('chef').then((recipe) => {
           expect(recipe).toBeTruthy();
           expect(recipe.name).not.toBe(name);
           expect(recipe.description).not.toBe(description);
@@ -132,22 +132,22 @@ describe('PATCH /recipes', () => {
 describe('DELETE /recipes', () => {
   it('should delete specified recipe', (done) => {
 
-    var _id = recipes[0]._id;
+    var shortId = recipes[0].shortId;
     var chef = chefs[1]._id.toHexString();
 
     request(app)
       .delete('/recipes')
-      .send({_id, chef})
+      .send({shortId, chef})
       .expect(200)
       .expect((res) => {
         expect(res.body._id).toBeTruthy();
-        expect(res.body._id).toBe(_id.toHexString());
+        expect(res.body.shortId).toBe(shortId);
       })
       .end((err) => {
         if(err) {
           return done(err);
         }
-        Recipe.findOne({_id}).populate('chef').then((recipe) => {
+        Recipe.findOne({shortId}).populate('chef').then((recipe) => {
           expect(recipe).toBeFalsy();
           done();
         }).catch((err) => done(err));
@@ -156,12 +156,12 @@ describe('DELETE /recipes', () => {
 
   it('should not delete other users recipe', (done) => {
 
-    var _id = recipes[0]._id;
+    var shortId = recipes[0].shortId;
     var chef = chefs[0]._id.toHexString();
 
     request(app)
       .delete('/recipes')
-      .send({_id, chef})
+      .send({shortId, chef})
       .expect(400)
       .expect((res) => {
         expect(res.body._id).toBeFalsy();
@@ -170,10 +170,58 @@ describe('DELETE /recipes', () => {
         if(err) {
           return done(err);
         }
-        Recipe.findOne({_id}).populate('chef').then((recipe) => {
+        Recipe.findOne({shortId}).populate('chef').then((recipe) => {
           expect(recipe).toBeTruthy();
           done();
         }).catch((err) => done(err));
       });
   });
+});
+
+describe('GET /recipes', () => {
+  it('should get specified recipe', (done) => {
+
+    var shortId = recipes[0].shortId;
+
+    request(app)
+      .get('/recipes/'+shortId)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body._id).toBeTruthy();
+        expect(res.body.shortId).toBe(shortId);
+      })
+      .end((err) => {
+        if(err) {
+          return done(err);
+        }
+        Recipe.findOne({shortId}).then((recipe) => {
+          expect(recipe).toBeTruthy();
+          expect(recipe.shortId).toBe(shortId);
+          done();
+        }).catch((err) => done(err));
+      });
+  });
+/*
+  it('should not delete other users recipe', (done) => {
+
+    var shortId = recipes[0].shortId;
+    var chef = chefs[0]._id.toHexString();
+
+    request(app)
+      .delete('/recipes')
+      .send({shortId, chef})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body._id).toBeFalsy();
+      })
+      .end((err) => {
+        if(err) {
+          return done(err);
+        }
+        Recipe.findOne({shortId}).populate('chef').then((recipe) => {
+          expect(recipe).toBeTruthy();
+          done();
+        }).catch((err) => done(err));
+      });
+  });*/
 });

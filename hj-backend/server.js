@@ -154,7 +154,7 @@ app.post('/recipes', (req, res) => {
 app.delete('/recipes', (req, res) => {
 
 
-    var body = _.pick(req.body, ['_id', 'chef']);
+    var body = _.pick(req.body, ['shortId', 'chef']);
 
     let chefIdField = '_id';
     let chefIdValue = body.chef;
@@ -176,13 +176,13 @@ app.delete('/recipes', (req, res) => {
         return res.status(400).send();
       }
       chef = chefDb;
-      return Recipe.findOneAndRemove({_id: body._id, chef:chefDb});
+      return Recipe.findOneAndRemove({shortId: body.shortId, chef:chefDb});
     }, (err) => {
         return res.status(400).send(err.message);
     })
     .then((recipeDb) => {
       if(!recipeDb) {
-        throw 'Recipe was not found';
+        throw `Recipe was not found: ${body.shortId}`;
       }
       recipe = recipeDb;
       let recipeRef = chef.recipes.find(o => o._id.toHexString() === recipeDb._id.toHexString());
@@ -200,7 +200,7 @@ app.delete('/recipes', (req, res) => {
 
 app.patch('/recipes', (req, res) => {
 
-  var body = _.pick(req.body, ['_id', 'name', 'description', 'portions',
+  var body = _.pick(req.body, ['shortId', 'name', 'description', 'portions',
               'cookingTime', 'chef', 'locale', 'ingredients', 'instructions']);
 
   let chefIdField = '_id';
@@ -224,13 +224,14 @@ app.patch('/recipes', (req, res) => {
       return res.status(400).send();
     }
     chef = chefDb;
-    return Recipe.findOne({_id: body._id}).populate('chef')
+    return Recipe.findOne({shortId: body.shortId}).populate('chef')
   }, (err) => {
+
       return res.status(400).send(err.message);
   })
   .then((recipeDb) => {
     if(!recipeDb) {
-      throw 'Recipe was not found';
+      throw `Recipe was not found: ${body.shortId}`;
     }
     if(recipeDb.chef._id.toHexString() !== chef._id.toHexString()) {
       throw 'This is not your recipe';
@@ -254,7 +255,7 @@ app.patch('/recipes', (req, res) => {
     return res.status(200).send(recipe);
   })
   .catch((err) => {
-    console.log('Error saving recipe', err);
+    console.log('Error saving recipe,', err);
     res.status(400).send(err.message);
   });
 });
@@ -270,12 +271,9 @@ app.get('/recipes', function(req, res){
 });
 
 app.get('/recipes/:id', (req, res) => {
-  var id = req.params.id;
-  if(!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
+  var shortId = req.params.id;
 
-  Recipe.findOne({_id: id}).populate('chef')
+  Recipe.findOne({shortId}).populate('chef')
   .then((recipe) => {
     if(!recipe) {
       return res.status(404).send();
@@ -332,12 +330,9 @@ app.get('/chefs/me', (req, res) => {
 });
 
 app.get('/chefs/:id', (req, res) => {
-  var id = req.params.id;
-  if(!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
+  var shortId = req.params.id;
 
-  Chef.findOne({_id: id})
+  Chef.findOne({shortId})
   .then((chef) => {
     if(!chef) {
       return res.status(404).send();
@@ -350,14 +345,10 @@ app.get('/chefs/:id', (req, res) => {
 });
 
 app.patch('/chefs/:id', (req, res) => {
-  var id = req.params.id;
+  var shortId = req.params.id;
   var body = _.pick(req.body, ['name','avatar','locale']);
 
-  if(!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
-
-  Chef.findOneAndUpdate({_id: id}, {$set: body}, {new: true})
+  Chef.findOneAndUpdate({shortId}, {$set: body}, {new: true})
   .then((chef) => {
     if(!chef) {
       return res.status(404).send();
