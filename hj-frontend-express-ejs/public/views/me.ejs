@@ -7,35 +7,61 @@
 
 <%- include ./partials/header %>
 
+<h3>My profile</h3>
+
+
 <div class="row">
 
-    <div class="col-sm-8">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <img src="<%=chef.avatar%>" class="rounded-circle"/>
-            Chef <%=chef.name%>
-          </h3>
-        </div>
-        <div class="card-body text-center">
-
-          <ul class="list-group">
-            <li class="list-group-item">My recipes</li>
-            <% chef.recipes.forEach(function(recipe, index) { %>
-              <li class="list-group-item"><a href="/recipes/<%=recipe.shortId%>"><%=recipe.name%></a></li>
-            <% }) %>
-            <% if(chef.recipes.length === 0){ %>
-              <li class="list-group-item">No recipes yet!</li>
-            <% } %>
-        </ul>
-        </div>
-        <div class="card-footer small">
-          <p/>
-        </div>
-      </div>
+   <div class="col-md-4">
+     <div class="card mt-3">
+       <div class="card-body">
+         <h4 class="card-title">Recipes</h4>
+         <p class="card-text"></p>
+       </div>
+       <ul class="list-group list-group-flush">
+         <% chef.recipes.forEach(function(recipe, index) { %>
+           <li class="list-group-item"><a href="/recipes/<%=recipe.shortId%>"><%=recipe.name%></a></li>
+         <% }) %>
+         <% if(chef.recipes.length === 0){ %>
+           <li class="list-group-item">No recipes yet!</li>
+         <% } %>
+     </ul>
     </div>
+   </div>
 
-  </div>
+   <div class="col-md-6">
+     <div class="card mt-3">
+       <div class="card-body">
+         <h4 class="card-title">Personal</h4>
+         <p class="card-text">
+
+           <table class="table">
+             <tbody>
+               <tr>
+                 <th scope="row">Avatar</th>
+                 <td><img src="<%=chef.avatar%>" class="rounded-circle"/></td>
+                 <td>Edit</td>
+               </tr>
+               <tr>
+                 <th scope="row">Nickname</th>
+                 <td><%=chef.name%></td>
+                 <td>Edit</td>
+               </tr>
+               <tr>
+                 <th scope="row">Active</th>
+                 <td>Yes</td>
+                 <td>Edit</td>
+               </tr>
+             </tbody>
+           </table>
+         </p>
+       </div>
+     </ul>
+    </div>
+   </div>
+
+ </div>
+
 </div>
 
 </body>

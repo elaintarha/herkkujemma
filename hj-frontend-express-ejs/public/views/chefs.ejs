@@ -10,7 +10,7 @@
   <h3>All chefs</h3>
 
   <div class="row">
-  <% chefs.forEach(function(chef, index) { %>
+  <% for(let chef of chefs) { %>
     <div class="col-sm-4">
 
       <div class="card mt-3">
@@ -21,9 +21,10 @@
           Latest recipes:
           </p>
           <ul>
-          <% chef.recipes.forEach(function(recipe, index) { %>
-            <li><a href="/recipes/<%=recipe.shortId%>"><%=recipe.name%></a></li>
-          <% }) %>
+          <% for(var i=0;i<chef.recipes.length;i++){ %>
+            <li><a href="/recipes/<%=chef.recipes[i].shortId%>"><%=chef.recipes[i].name%></a></li>
+          <% if(i === 2) {break;}
+          } %>
         </ul>
         </div>
         <ul class="list-group list-group-flush">
@@ -31,7 +32,7 @@
         </ul>
       </div>
 
-  <% }) %>
+  <% } %>
   </div>
 
   </div>
