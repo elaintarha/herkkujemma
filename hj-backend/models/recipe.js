@@ -61,13 +61,10 @@ var RecipeSchema = new mongoose.Schema({
       trim: true
     }
   }],
-  pictures: [{
-    url: {
+  pictureUrl: {
       type: String,
-      trim: true,
-      require: true
+      trim: true
     }
-  }]
 });
 
 

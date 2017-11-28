@@ -50,8 +50,8 @@ var ChefSchema = new mongoose.Schema({
     shortId: {
       type: String,
       require: true
-    },    
-    picture: {
+    },
+    pictureUrl: {
       type: String
     }
   }]

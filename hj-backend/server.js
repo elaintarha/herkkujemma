@@ -106,7 +106,7 @@ if(process.env.NODE_ENV != 'test') {
 app.post('/recipes', (req, res) => {
 
   var body = _.pick(req.body, ['name', 'description', 'portions', 'cookingTime',
-                'chef', 'locale', 'ingredients', 'instructions']);
+                'chef', 'locale', 'ingredients', 'instructions', 'pictureUrl']);
 
   let chefIdField = '_id';
   let chefIdValue = body.chef;
@@ -142,7 +142,7 @@ app.post('/recipes', (req, res) => {
     return chef.save();
   })
   .then((chefDb2) => {
-    return res.status(200).send(recipe);
+    return res.status(200).send({recipe});
   })
   .catch((err) => {
     console.log('Error saving recipe', err);
@@ -152,7 +152,6 @@ app.post('/recipes', (req, res) => {
 });
 
 app.delete('/recipes', (req, res) => {
-
 
     var body = _.pick(req.body, ['shortId', 'chef']);
 
@@ -170,6 +169,7 @@ app.delete('/recipes', (req, res) => {
 
     let chef;
     let recipe;
+    let pictureToDelete;
     Chef.findOne({[chefIdField]: chefIdValue})
     .then((chefDb) => {
       if(!chefDb) {
@@ -185,12 +185,13 @@ app.delete('/recipes', (req, res) => {
         throw `Recipe was not found: ${body.shortId}`;
       }
       recipe = recipeDb;
+      pictureToDelete = recipeDb.pictureUrl;
       let recipeRef = chef.recipes.find(o => o._id.toHexString() === recipeDb._id.toHexString());
       chef.recipes.pull(recipeRef);
       return chef.save();
     })
     .then((chefDb2) => {
-      return res.status(200).send(recipe);
+      return res.status(200).send({recipe, pictureToDelete});
     })
     .catch((err) => {
       console.log('Error deleting recipe', err);
@@ -201,7 +202,7 @@ app.delete('/recipes', (req, res) => {
 app.patch('/recipes', (req, res) => {
 
   var body = _.pick(req.body, ['shortId', 'name', 'description', 'portions',
-              'cookingTime', 'chef', 'locale', 'ingredients', 'instructions']);
+              'cookingTime', 'chef', 'locale', 'ingredients', 'instructions', 'pictureUrl']);
 
   let chefIdField = '_id';
   let chefIdValue = body.chef;
@@ -213,6 +214,7 @@ app.patch('/recipes', (req, res) => {
 
   let chef;
   let recipe;
+  let pictureToDelete;
 
   if(chefIdField == '_id' && !ObjectID.isValid(body.chef)) {
     return res.status(400).send();
@@ -243,16 +245,22 @@ app.patch('/recipes', (req, res) => {
     recipeDb.locale = body.locale;
     recipeDb.ingredients = body.ingredients;
     recipeDb.instructions = body.instructions;
+
+    if(recipeDb.pictureUrl !== body.pictureUrl) {
+      pictureToDelete = recipeDb.pictureUrl;
+      recipeDb.pictureUrl = body.pictureUrl;
+    }
     return recipeDb.save();
   })
   .then((recipeDb2) => {
     recipe = recipeDb2;
     let recipeRef = chef.recipes.find(o => o._id.toHexString() === recipeDb2._id.toHexString());
     recipeRef.name = recipeDb2.name;
+    recipeRef.pictureUrl = recipeDb2.pictureUrl;
     return chef.save();
   })
   .then((chefDb2) => {
-    return res.status(200).send(recipe);
+    return res.status(200).send({recipe, pictureToDelete});
   })
   .catch((err) => {
     console.log('Error saving recipe,', err);
