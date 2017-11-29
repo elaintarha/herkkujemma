@@ -15,12 +15,11 @@ const ensureUserLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 const multer  = require('multer');
 var storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const sharp = require('sharp');
 
 // load server, auth and s3 configs
 dotenv.load();
 const {serverAuth,userStrategy,userAuthParams} = require('./auth/auth.js');
-const {s3} = require('./aws/s3.js');
+const s3 = require('./aws/s3.js');
 
 let cachedServerAuthToken;
 let cachedServerAuthTokenTTL = 0;
@@ -131,53 +130,6 @@ app.get('/about', function(req, res){
   res.render('about', {nav:'about', loggedIn: req.user});
 });
 
-function savePictureToS3(type, file) {
-
-  let bucketKey = 'hj-recipes';
-  let filePrefix = 'r';
-
-  if(type && type === 'chef') {
-    bucketKey = 'hj-chefs'
-    filePrefix = 'c';
-  }
-
-  let fileName = filePrefix + new Date().getTime() + '.jpg';
-
-  sharp(file)
-  .resize(800, 600)
-  .max()
-  .toFormat('jpeg')
-  .toBuffer()
-  .then(function(data) {
-
-      var params = {Bucket: bucketKey, Key: fileName, Body: data, ACL: 'public-read'};
-
-      var result = s3.upload(params, function(err, data) {
-        if (err) {
-           console.error(err, err.stack); // an error occurred
-           return null;
-        }
-    });
-  });
-  return fileName;
-};
-
-function delPictureFromS3(type, fileName) {
-
-  let bucketKey = 'hj-recipes';
-
-  if(type && type === 'chef') {
-    bucketKey = 'hj-chefs'
-  }
-
-  var params = {Bucket: bucketKey, Key: fileName};
-
-  var result = s3.deleteObject(params, function(err, data) {
-    if (err) {
-      console.error(err, err.stack); // an error occurred
-    }
-  });
-};
 
 // get token, add it to request header, get data and render it or deny
 // superagent does the handling of backend request
@@ -185,7 +137,7 @@ app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(
 
   let pictureUrl = null;
   if(req.file) {
-    pictureUrl = savePictureToS3('recipe',req.file.buffer);
+    pictureUrl = s3.savePicture('recipe',req.file.buffer);
   }
   let shortId = req.body.shortId;
 
@@ -235,7 +187,7 @@ app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(
 function handlePostRecipeResult(req, res, err, data) {
   if(data.status == 200){
     if(data.body.pictureToDelete) {
-      delPictureFromS3('recipe', data.body.pictureToDelete);
+      s3.delPicture('recipe', data.body.pictureToDelete);
     }
     res.redirect('/recipes/'+data.body.recipe.shortId);
   } else {
@@ -307,7 +259,7 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res){
            return res.status(404).send("Sorry can't find that!");
          }
          if(data.body.pictureToDelete) {
-           delPictureFromS3('recipe', data.body.pictureToDelete);
+           s3.delPicture('recipe', data.body.pictureToDelete);
          }
          res.redirect('/chefs/me');
        }
