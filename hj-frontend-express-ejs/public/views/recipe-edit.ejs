@@ -131,6 +131,7 @@
 
       <%if(recipe._id) {%>
         <input type="hidden" name="shortId" value="<%= recipe.shortId %>" />
+        <input type="hidden" name="_id" value="<%= recipe._id %>" />
       <% } %>
       <p class="lead">
         <button type="submit" class="btn btn-primary btn-lg btn-block">Save</button>

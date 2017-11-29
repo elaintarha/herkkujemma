@@ -88,7 +88,7 @@ app.post('/recipes', (req, res) => {
     recipe = new Recipe(body);
     return recipe.save();
   }, (err) => {
-      return res.status(400).send(err.message);
+      return res.status(400).send({recipe,err:err.message});
   })
   .then((recipeDb) => {
     recipe = recipeDb;
@@ -99,8 +99,7 @@ app.post('/recipes', (req, res) => {
     return res.status(200).send({recipe});
   })
   .catch((err) => {
-    console.log('Error saving recipe', err);
-    res.status(400).send(err.message);
+    res.status(400).send({recipe, err:err.message});
   });
 
 });
@@ -153,7 +152,7 @@ app.delete('/recipes', (req, res) => {
 });
 
 app.patch('/recipes', (req, res) => {
-  var body = _.pick(req.body, ['shortId', 'name', 'description', 'portions',
+  var body = _.pick(req.body, ['_id','shortId', 'name', 'description', 'portions',
               'cookingTime', 'chef', 'locale', 'ingredients', 'instructions', 'pictureUrl']);
 
   let chefIdField = '_id';
@@ -165,7 +164,7 @@ app.patch('/recipes', (req, res) => {
   }
 
   let chef;
-  let recipe;
+  let recipe = body;
   let pictureToDelete;
 
   if(chefIdField == '_id' && !ObjectID.isValid(body.chef)) {
@@ -178,10 +177,7 @@ app.patch('/recipes', (req, res) => {
       return res.status(400).send();
     }
     chef = chefDb;
-    return Recipe.findOne({shortId: body.shortId}).populate('chef')
-  }, (err) => {
-
-      return res.status(400).send(err.message);
+    return Recipe.findOne({shortId: body.shortId}).populate('chef');
   })
   .then((recipeDb) => {
     if(!recipeDb) {
@@ -190,6 +186,7 @@ app.patch('/recipes', (req, res) => {
     if(recipeDb.chef._id.toHexString() !== chef._id.toHexString()) {
       throw 'This is not your recipe';
     }
+
     recipeDb.name = body.name;
     recipeDb.description = body.description;
     recipeDb.cookingTime = body.cookingTime;
@@ -215,8 +212,7 @@ app.patch('/recipes', (req, res) => {
     return res.status(200).send({recipe, pictureToDelete});
   })
   .catch((err) => {
-    console.log('Error saving recipe,', err);
-    res.status(400).send(err.message);
+    res.status(400).send({recipe, err:err.message});
   });
 });
 

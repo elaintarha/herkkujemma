@@ -192,9 +192,11 @@ function handlePostRecipeResult(req, res, err, data) {
     res.redirect('/recipes/'+data.body.recipe.shortId);
   } else {
     if(data.body.recipe && data.body.recipe._id) {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Edit', recipe: data.body.recipe, errorMessage: err.response.text});
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
+      title: 'Edit', recipe: data.body.recipe, errorMessage: data.body.err});
     } else {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user, title: 'Add', recipe: data.body.recipe, errorMessage: err.response.text});
+      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
+      title: 'Add', recipe: data.body.recipe, errorMessage: data.body.err});
     }
   }
 }
