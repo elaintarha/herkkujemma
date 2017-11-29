@@ -116,7 +116,7 @@ app.get('/', getPublicAccessToken, function(req, res, next){
     .get(process.env.BACKEND + '/recipes')
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
-      if(err) {
+      if(err && err.status !== 404) {
         return next(err);
       }
       if(data.status == 403){
@@ -189,7 +189,7 @@ app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(
 
 function handlePostRecipeResult(req, res, err, data, next) {
 
-  if(err) {
+  if(err && err.status !== 404) {
     return next(err);
   }
 
@@ -214,7 +214,7 @@ app.get('/recipes', getPublicAccessToken, function(req, res, next){
     .get(process.env.BACKEND + '/recipes')
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
-      if(err) {
+      if(err && err.status !== 404) {
         return next(err);
       }
       if(data.status == 403){
@@ -241,7 +241,7 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res, next){
     .get(process.env.BACKEND + '/recipes/' + id)
     .set('Authorization', 'Bearer ' + req.user.accessToken)
     .end(function(err, data) {
-      if(err) {
+      if(err && err.status !== 404) {
         return next(err);
       }
       if(data.status == 403){
@@ -268,7 +268,7 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
      .set('Authorization', 'Bearer ' + req.user.accessToken)
      .send({shortId})
      .end(function(err, data) {
-       if(err) {
+       if(err && err.status !== 404) {
          return next(err);
        }
        if(data.status == 403){
@@ -293,7 +293,7 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res, next){
     .get(process.env.BACKEND + '/recipes/' + id)
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
-      if(err) {
+      if(err && err.status !== 404) {
         return next(err);
       }
       if(data.status == 403){
@@ -315,7 +315,7 @@ app.get('/chefs', getPublicAccessToken, function(req, res, next){
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
       if(err) {
-        return next(err);
+        return next(err && err.status !== 404);
       }
       if(data.status == 403){
         res.send(403, '403 Forbidden');
@@ -352,7 +352,7 @@ app.post('/chefs/signup', ensureUserLoggedIn, function(req, res, next){
    .set('Authorization', 'Bearer ' + req.user.accessToken)
    .send({email, name, locale, avatar})
    .end(function(err, data) {
-     if(err) {
+     if(err && err.status !== 404) {
        return next(err);
      }
      if(data.status == 200){
@@ -372,7 +372,7 @@ app.get('/chefs/me', ensureUserLoggedIn, function(req, res, next){
    .get(process.env.BACKEND + '/chefs/me')
    .set('Authorization', 'Bearer ' + req.user.accessToken)
    .end(function(err, data) {
-     if(err) {
+     if(err && err.status !== 404) {
        return next(err);
      }
      if(data.status == 200){
@@ -391,7 +391,7 @@ app.get('/chefs/:id', getPublicAccessToken, function(req, res, next){
     .get(process.env.BACKEND + '/chefs/' + id)
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
-      if(err) {
+      if(err && err.status !== 404) {
         return next(err);
       }
       if(data.status == 403){
@@ -428,7 +428,7 @@ app.get( '/callback', passport.authenticate('auth0', {
      .get(process.env.BACKEND + '/chefs/me')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
      .end(function(err, data) {
-       if(err) {
+       if(err && err.status !== 404) {
          return next(err);
        }
        if(data.status == 200){
