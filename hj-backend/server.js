@@ -36,67 +36,23 @@ app.use(function (err, req, res, next) {
   }
 });
 
-// define token auth scopes for routes
-// @todo this doesn't work at all with parameterized routes
+// enforce admin scope for admin pages
 const guard = function(req, res, next){
-  // case switch list for routes
-  switch(req.path){
 
-    // if the request is for recipes it needs general scope
-    case '/recipes' : {
-      var permissions = ['general'];
-      for(var i = 0; i < permissions.length; i++){
-        if(req.user.scope.includes(permissions[i])){
-          next();
-        } else {
-          res.send(403, {message:'Forbidden'});
-        }
+  if(req.path.startsWith('/admin')) {
+    var permissions = ['admin'];
+    for(var i = 0; i < permissions.length; i++){
+      if(req.user.scope.includes(permissions[i])){
+        next();
+      } else {
+        res.send(403, {message:'Forbidden'});
       }
-      break;
     }
-    // same for the chefs
-    case '/chefs': {
-      var permissions = ['general'];
-      for(var i = 0; i < permissions.length; i++){
-        if(req.user.scope.includes(permissions[i])){
-          next();
-        } else {
-          res.send(403, {message:'Forbidden'});
-        }
-      }
-      break;
-    }
-    // same for the logged in chef
-    case '/chefs/me': {
-      var permissions = ['general'];
-      for(var i = 0; i < permissions.length; i++){
-        if(req.user.scope.includes(permissions[i])){
-          next();
-        } else {
-          res.send(403, {message:'Forbidden'});
-        }
-      }
-      break;
-    }
-    // @todo this doesnt work
-    case '/chefs/:id': {
-
-      var permissions = ['general'];
-      for(var i = 0; i < permissions.length; i++){
-        if(req.user.scope.includes(permissions[i])){
-          next();
-        } else {
-          res.send(403, {message:'Forbidden'});
-        }
-      }
-      break;
-    }
-    default: {
-      console.log('Guard missed path (not good): ', req.path);
-      next();
-    }
+  } else {
+    next();
   }
 }
+
 if(process.env.NODE_ENV != 'test') {
  app.use(guard);
 }

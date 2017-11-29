@@ -32,7 +32,7 @@ var userAuthParams = {
     redirectUri: process.env.AUTH0_USER_CALLBACK_URL,
     responseType: 'token id_token',
     audience: process.env.AUTH0_USER_AUDIENCE,
-    scope: 'openid profile email general'
+    scope: 'openid profile email'
 }
 
 module.exports = {serverAuth, userStrategy, userAuthParams};
