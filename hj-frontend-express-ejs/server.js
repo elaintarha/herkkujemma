@@ -430,6 +430,7 @@ app.get('/login', passport.authenticate('auth0', userAuthParams),
 });
 
 app.get('/logout', function(req, res) {
+  req.logout();
   req.session.destroy(function (err) {
     res.clearCookie('connect.sid');
     res.redirect('/');
