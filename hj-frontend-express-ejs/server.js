@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+var LokiStore = require('connect-loki')(session);
 const dateFormat = require('dateformat');
 const objectIdToTimestamp = require('objectid-to-timestamp');
 const dotenv = require('dotenv');
@@ -52,12 +52,11 @@ app.use(express.static(__dirname + '/public'));
 // @todo conf session store
 app.use(
   session({
-    store: new FileStore(
-      {path: '../data-hj-ejs/sessions',
-      ttl: (24*3600),
-      reapInterval: 3600}),
+    store: new LokiStore(
+      {path: '../data-hj-ejs/session-store.db',
+      logErrors: true}),
     secret: 'shhhhhhhh22',
-    resave: true,
+    resave: false,
     saveUninitialized: false
   })
 );
@@ -158,7 +157,7 @@ function savePictureToS3(type, file) {
 
       var result = s3.upload(params, function(err, data) {
         if (err) {
-           console.log(err, err.stack); // an error occurred
+           console.error(err, err.stack); // an error occurred
            return null;
         }
     });
@@ -178,7 +177,7 @@ function delPictureFromS3(type, fileName) {
 
   var result = s3.deleteObject(params, function(err, data) {
     if (err) {
-      console.log(err, err.stack); // an error occurred
+      console.error(err, err.stack); // an error occurred
     }
   });
 };
@@ -431,8 +430,10 @@ app.get('/login', passport.authenticate('auth0', userAuthParams),
 });
 
 app.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
+  req.session.destroy(function (err) {
+    res.clearCookie('connect.sid');
+    res.redirect('/');
+  });
 });
 
 app.get( '/callback',
@@ -472,8 +473,8 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
+    console.error(err, err.stack);
+  res.status(500).send('Something broke!');
 });
 
 // launch the frontend server
