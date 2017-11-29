@@ -16,13 +16,10 @@ const multer  = require('multer');
 var storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const sharp = require('sharp');
-/* multer({ dest: '../data-hj-ejs/uploads/' }) */
 
+// load server, auth and s3 configs
 dotenv.load();
-
-// load auth configs
 const {serverAuth,userStrategy,userAuthParams} = require('./auth/auth.js');
-// load s3 image storage
 const {s3} = require('./aws/s3.js');
 
 let cachedServerAuthToken;
