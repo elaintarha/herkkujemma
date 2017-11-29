@@ -24,8 +24,19 @@
         name="name" id="name" aria-describedby="nameHelp" placeholder="Enter recipe name"
         <%if(recipe.name) {%>value="<%=recipe.name%>"<% } %> />
 
-        <input type="file" class="form-control"
-        name="dishPicture" id="dishPicture" aria-describedby="dishPictureHelp" placeholder="Add picture"/>
+        <div class="row mt-2 mb-2">
+        <div class="col">
+          <label for="dishPicture">Add/Change picture</label>
+          <input type="file" class="form-control"
+          name="dishPicture" id="dishPicture" aria-describedby="dishPictureHelp" placeholder="Add picture"/>
+        </div>
+        <%if (recipe.pictureUrl) { %>
+          <div class="col">
+            <label for="currentPicture">Current picture</label>
+            <img class="img-fluid" id="currentPicture" style="max-height:200px" src="<%=imageServer%>/hj-recipes/<%=recipe.pictureUrl%>"/>
+            <input type="hidden" name="pictureUrl" value="<%=recipe.pictureUrl%>" />
+          </div>
+        <% } %>
       </div>
       <div class="form-group">
         <label for="description">Description</label>

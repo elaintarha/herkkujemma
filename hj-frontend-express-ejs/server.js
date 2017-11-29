@@ -135,7 +135,7 @@ app.get('/about', function(req, res){
 // superagent does the handling of backend request
 app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(req, res){
 
-  let pictureUrl = null;
+  let pictureUrl = req.body.pictureUrl;
   if(req.file) {
     pictureUrl = s3.savePicture('recipe',req.file.buffer);
   }
