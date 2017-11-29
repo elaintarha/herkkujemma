@@ -11,11 +11,11 @@
 
   <div class="row">
   <% for(let chef of chefs) { %>
-    <div class="col-sm-4">
+    <div class="col-md-4">
 
       <div class="card mt-3">
         <div class="card-body">
-          <h4 class="card-title"><img class="rounded-circle" src="<%= chef.avatar %>" /> <%=chef.name%></h4>
+          <h4 class="card-title"><img class="rounded-circle" style="max-height:50px" src="<%= chef.avatar %>" /> <%=chef.name%></h4>
           <h6 class="card-subtitle mb-2 text-muted">Spaghetti code masterchef</h6>
           <p class="card-text">
           Latest recipes:
@@ -31,9 +31,9 @@
           <li class="list-group-item"><a href="/chefs/<%=chef.shortId%>" class="card-link">See profile</a></li>
         </ul>
       </div>
-
+    </div>
   <% } %>
-  </div>
+
 
   </div>
 </div>
