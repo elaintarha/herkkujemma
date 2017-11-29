@@ -306,7 +306,7 @@ app.post('/chefs', (req, res) => {
   chef.save().then((result) => {
     res.status(200).send(result);
   }, (err) => {
-    res.status(400).send(err.message);
+    res.status(400).send({err:err.message, chef:body});
   });
 });
 

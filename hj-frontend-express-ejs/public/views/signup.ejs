@@ -19,8 +19,8 @@
 
     <form action="/chefs/signup" method="post">
      <div class="form-group">
-      <label for="nickname">Your Chef name</label>
-      <input type="text" class="form-control" name="nickname" id="nickname" aria-describedby="nicknameHelp" placeholder="Enter Chef name" value="<%= signupFields.nickname %>">
+      <label for="name">Your Chef name</label>
+      <input type="text" class="form-control" name="name" id="name" aria-describedby="nameHelp" placeholder="Enter Chef name" value="<%= signupFields.name %>">
     </div>
     <div class="form-group">
       <label for="email">Email address</label>
@@ -34,7 +34,7 @@
         <option>fi</option>
       </select>
     </div>
-    <input type="hidden" name="avatar" value="<%= signupFields.picture %>" />
+    <input type="hidden" name="avatar" value="<%= signupFields.avatar %>" />
     <p class="lead">
       <button type="submit" class="btn btn-primary btn-lg">Submit</button>
     </p>

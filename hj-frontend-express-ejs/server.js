@@ -356,9 +356,9 @@ app.get('/chefs', getPublicAccessToken, function(req, res){
 app.get('/chefs/signup', ensureUserLoggedIn, function(req, res){
 
   let signupFields = {
-    nickname: req.user.nickname,
+    name: req.user.nickname,
     email: req.user.emails[0].value,
-    picture: req.user.picture,
+    avatar: req.user.picture,
     locale: req.user.locale
   };
   let errorMessage = req.query.err;
@@ -369,7 +369,7 @@ app.get('/chefs/signup', ensureUserLoggedIn, function(req, res){
 app.post('/chefs/signup', ensureUserLoggedIn, function(req, res){
 
   let email = req.body.email;
-  let name = req.body.nickname;
+  let name = req.body.name;
   let avatar = req.body.avatar;
   let locale = req.body.locale;
 
@@ -384,7 +384,7 @@ app.post('/chefs/signup', ensureUserLoggedIn, function(req, res){
        res.redirect(req.session.returnTo || '/chefs/me');
      } else {
        req.user.hasProfile = false;
-       res.redirect('/chefs/signup?err='+err.response.text);
+        res.render('signup', {nav:'recipes', signupFields: data.body.chef, errorMessage: data.body.err});
      }
    });
 });
