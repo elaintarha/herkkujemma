@@ -147,7 +147,7 @@ function savePictureToS3(type, file) {
   let fileName = filePrefix + new Date().getTime() + '.jpg';
 
   sharp(file)
-  .resize(800, 800)
+  .resize(800, 600)
   .max()
   .toFormat('jpeg')
   .toBuffer()
