@@ -38,7 +38,6 @@ app.use(function (err, req, res, next) {
 
 // enforce admin scope for admin pages
 const guard = function(req, res, next){
-
   if(req.path.startsWith('/admin')) {
     var permissions = ['admin'];
     for(var i = 0; i < permissions.length; i++){
@@ -58,9 +57,8 @@ if(process.env.NODE_ENV != 'test') {
 }
 // routes
 
-// implement the recipes API endpoints
+// implement the /recipes API endpoints
 app.post('/recipes', (req, res) => {
-
   var body = _.pick(req.body, ['name', 'description', 'portions', 'cookingTime',
                 'chef', 'locale', 'ingredients', 'instructions', 'pictureUrl']);
 
@@ -108,7 +106,6 @@ app.post('/recipes', (req, res) => {
 });
 
 app.delete('/recipes', (req, res) => {
-
     var body = _.pick(req.body, ['shortId', 'chef']);
 
     let chefIdField = '_id';
@@ -156,7 +153,6 @@ app.delete('/recipes', (req, res) => {
 });
 
 app.patch('/recipes', (req, res) => {
-
   var body = _.pick(req.body, ['shortId', 'name', 'description', 'portions',
               'cookingTime', 'chef', 'locale', 'ingredients', 'instructions', 'pictureUrl']);
 
@@ -225,7 +221,6 @@ app.patch('/recipes', (req, res) => {
 });
 
 app.get('/recipes', function(req, res){
-
   Recipe.find().populate('chef')
   .then((recipes) => {
     res.json(recipes);
@@ -250,9 +245,8 @@ app.get('/recipes/:id', (req, res) => {
 
 });
 
-// implement the chefs API endpoints
+// implement the /chefs API endpoints
 app.post('/chefs', (req, res) => {
-
   var body = _.pick(req.body, ['email','sub','name','locale','avatar']);
   // use the identity from auth0 in prod
   if(req.user && req.user.sub) {
@@ -275,7 +269,6 @@ app.get('/chefs', (req, res) => {
 });
 
 app.get('/chefs/me', (req, res) => {
-
   if(!req.user.sub) {
     return res.status(400).send();
   }
