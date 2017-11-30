@@ -16,6 +16,11 @@
             <img src="<%=chef.avatar%>" style="max-height:50px" class="rounded-circle"/>
             Chef <%=chef.name%>
           </h3>
+          <h6 class="card-subtitle mb-2 text-muted">
+            <%if(chef.name === 'jaacco') {%>Spaghetti code masterchef<%
+             } else if(chef.recipes.length === 0) {%>Shy chef<%
+             } else {%>Masterchef in training<%}%>
+          </h6>
         </div>
         <div class="card-body">
           <h4>All Chefs recipes</h4>
