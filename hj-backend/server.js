@@ -299,18 +299,26 @@ app.get('/chefs/:id', (req, res) => {
 
 app.patch('/chefs/:id', (req, res) => {
   var shortId = req.params.id;
-  var body = _.pick(req.body, ['name','avatar','locale']);
+  var body = _.pick(req.body, ['name','email','avatar','locale']);
 
-  Chef.findOneAndUpdate({shortId}, {$set: body}, {new: true})
+  let chefIdField = 'shortId';
+  let chefIdValue = shortId;
+  // use the identity from auth0 in prod
+  if(req.user && req.user.sub) {
+    chefIdField = 'sub';
+    chefIdValue = req.user.sub;
+  }
+
+  Chef.findOneAndUpdate({[chefIdField]:chefIdValue}, {$set: body}, {new: true})
   .then((chef) => {
     if(!chef) {
       return res.status(404).send();
     }
     res.send({chef});
   }).catch((err) => {
-    res.status(400).send();
+    console.error(err);
+    res.status(400).send({err:err.message});
   });
-
 });
 
 // launch  server
