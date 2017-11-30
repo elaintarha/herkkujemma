@@ -44,7 +44,7 @@ app.locals.imageServer = process.env.AWS_URL;
 app.locals.imageDir = process.env.AWS_BUCKET;
 
 // set the directory to serve static assets
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public', { maxAge: '1d' }));
 
 // @todo conf session store
 app.use(
