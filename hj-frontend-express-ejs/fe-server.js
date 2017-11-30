@@ -190,7 +190,7 @@ app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(
 
 function handlePostRecipeResult(req, res, err, data, next) {
 
-  if(err && err.status !== 404) {
+  if(err && err.status !== 404  && err.status !== 400) {
     return next(err);
   }
 
@@ -353,7 +353,7 @@ app.post('/chefs/signup', ensureUserLoggedIn, function(req, res, next){
    .set('Authorization', 'Bearer ' + req.user.accessToken)
    .send({email, name, locale, avatar})
    .end(function(err, data) {
-     if(err && err.status !== 404) {
+     if(err && err.status !== 404  && err.status !== 400) {
        return next(err);
      }
      if(data.status == 200){
