@@ -465,5 +465,5 @@ app.use(function (err, req, res, next) {
 
 // launch the frontend server
 app.listen(process.env.PORT, () => {
-    console.log(`Started on port ${process.env.PORT}`);
+  console.log(`Started on port ${process.env.PORT}, env: ${process.env.NODE_ENV}`);
 });
