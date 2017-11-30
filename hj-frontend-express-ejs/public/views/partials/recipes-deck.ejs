@@ -5,7 +5,7 @@
      <div class="card mt-3">
        <img class="card-img-top"
        <%if (recipe.pictureUrl) { %>
-         src="<%=imageServer%>/hj-recipes/<%=recipe.pictureUrl%>"
+         src="<%=imageServer%>/<%=imageDir%>/<%=recipe.pictureUrl%>"
        <% } else { %>data-src="holder.js/100px120?random=yes&font=FontAwesome&size=20&text=&#xf0f5;"<%}%>
        alt="Delicious image">
        <div class="card-body">

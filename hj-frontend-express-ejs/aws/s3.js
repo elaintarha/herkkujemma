@@ -9,24 +9,28 @@ var s3 = new AWS.S3({
 
 function savePicture(type, file) {
 
-  let bucketKey = 'hj-recipes';
+  let bucketKey = process.env.AWS_BUCKET;
   let filePrefix = 'r';
 
   if(type && type === 'chef') {
-    bucketKey = 'hj-chefs'
     filePrefix = 'c';
   }
 
-  let fileName = filePrefix + new Date().getTime() + '.jpg';
+  let fileName = filePrefix + new Date().getTime() + '.jpeg';
 
   sharp(file)
-  .resize(800, 600)
+  .resize(800, 800)
   .max()
   .toFormat('jpeg')
   .toBuffer()
   .then(function(data) {
 
-    var params = {Bucket: bucketKey, Key: fileName, Body: data, ACL: 'public-read'};
+    var params = {Bucket: bucketKey,
+                  Key: fileName,
+                  Body: data,
+                  ACL: 'public-read',
+                  ContentType: 'image/jpeg',
+                  CacheControl: 'public, max-age=31536000'};
 
     var result = s3.upload(params, function(err, data) {
       if (err) {

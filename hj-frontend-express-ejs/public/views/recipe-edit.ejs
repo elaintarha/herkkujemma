@@ -32,8 +32,8 @@
         </div>
         <%if (recipe.pictureUrl) { %>
           <div class="col">
-            <label for="currentPicture">Current picture</label>
-            <img class="img-fluid" id="currentPicture" style="max-height:200px" src="<%=imageServer%>/hj-recipes/<%=recipe.pictureUrl%>"/>
+            <label for="currentPicture">Current picture2</label>
+            <img class="img-fluid" id="currentPicture" style="max-height:200px" src="<%=imageServer%>/<%=imageDir%>/<%=recipe.pictureUrl%>"/>
             <input type="hidden" name="pictureUrl" value="<%=recipe.pictureUrl%>" />
           </div>
         <% } %>
