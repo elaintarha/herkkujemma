@@ -20,29 +20,38 @@
     <%if (recipe.pictureUrl) { %>
      <img class="img-fluid" style="max-height:600px" src="<%=imageServer%>/<%=imageDir%>/<%=recipe.pictureUrl%>"/>
     <% } %>
-    <p class="lead">Time to cook:<strong><%=recipe.cookingTime%> mins.</strong> Portions:<strong><%=recipe.portions%></strong></p>
+    <p class="lead">
+      <div class="row">
+        <div class="col-md-auto">Time to cook: <span class="badge badge-primary"><%=recipe.cookingTime%> mins.</span></div>
+        <div class="col-md-auto">Portions: <span class="badge badge-primary"><%=recipe.portions%></span></div>
+      </div>
+    </p>
+
     <hr class="my-4">
 
     <h5 class="display-5">Ingredients</h5>
-
-    <table class="table table-sm table-hover table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Ingredient</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Unit</th>
-        </tr>
-      </thead>
-      <tbody>
-       <%recipe.ingredients.forEach(function(ingredient, index) { %>
-        <tr>
-          <td><%=ingredient.title%></td>
-          <td><%=ingredient.quantity%></td>
-          <td><%=ingredient.unit%></td>
-        </tr>
-       <%})%>
-      </tbody>
-    </table>
+    <div class="row">
+      <div class="col-md-auto">
+        <table class="table table-sm table-hover table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">Ingredient</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%recipe.ingredients.forEach(function(ingredient, index) { %>
+              <tr>
+              <td><%=ingredient.title%></td>
+              <td><%=ingredient.quantity%></td>
+              <td><%=ingredient.unit%></td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <hr class="my-4">
 
