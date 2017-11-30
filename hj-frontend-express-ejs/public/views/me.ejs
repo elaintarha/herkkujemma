@@ -12,6 +12,53 @@
 
 <div class="row">
 
+   <div class="col-md-6">
+     <div class="card mt-3">
+       <div class="card-body personal">
+         <h4 class="card-title">Personal
+         <div class="float-right"> <a href="#save" data-toggle="collapse" class="btn btn-primary btn-sm btn-edit">Edit</a></div>
+         </h4>
+         <p class="card-text">
+           <% if(errorMessage) { %>
+              <div class="alert alert-danger" role="alert"><%=errorMessage%></div>
+           <% } %>
+           <form action="/chefs/me" method="post">
+           <table class="table">
+             <tbody>
+               <tr>
+                 <th scope="row">Avatar</th>
+                 <td><img src="<%=chef.avatar%>" class="rounded-circle" style="max-height:80px"/></td>
+                 <td></td>
+               </tr>
+               <tr>
+                 <th scope="row">Nickname</th>
+                 <td><input type="text" class="form-control"
+                   name="name" id="name" aria-describedby="nameHelp" placeholder="Enter chef name" value="<%=chef.name%>" disabled/>
+                 </td>
+                 <td></td>
+               </tr>
+               <tr>
+                 <th scope="row">Email</th>
+                 <td><%=chef.email%></td>
+                 <td></td>
+               </tr>
+               <tr>
+                 <th scope="row">Language</th>
+                 <td><%=chef.locale%></td>
+                 <td></td>
+               </tr>
+             </tbody>
+           </table>
+           <div class="float-right">
+           <button  type="submit"  id="save" class="btn btn-primary btn-sm btn-save collapse">Save</button>
+         </div>
+          </form>
+         </p>
+       </div>
+     </ul>
+    </div>
+   </div>
+
    <div class="col-md-4">
      <div class="card mt-3">
        <div class="card-body">
@@ -29,45 +76,22 @@
     </div>
    </div>
 
-   <div class="col-md-6">
-     <div class="card mt-3">
-       <div class="card-body">
-         <h4 class="card-title">Personal</h4>
-         <p class="card-text">
-
-           <table class="table">
-             <tbody>
-               <tr>
-                 <th scope="row">Avatar</th>
-                 <td><img src="<%=chef.avatar%>" class="rounded-circle" style="max-height:80px"/></td>
-                 <td>Edit</td>
-               </tr>
-               <tr>
-                 <th scope="row">Nickname</th>
-                 <td><%=chef.name%></td>
-                 <td>Edit</td>
-               </tr>
-               <tr>
-                 <th scope="row">Email</th>
-                 <td><%=chef.email%></td>
-                 <td>Edit</td>
-               </tr>
-               <tr>
-                 <th scope="row">Active</th>
-                 <td>Yes</td>
-                 <td>Edit</td>
-               </tr>
-             </tbody>
-           </table>
-         </p>
-       </div>
-     </ul>
-    </div>
-   </div>
-
  </div>
 
 </div>
 
+<script>
+$(function()
+{
+    $(document).on('click', '.btn-edit', function(e)
+    {
+      $( "#name" ).prop('disabled',!$( "#name" ).prop('disabled'));
+		e.preventDefault();
+		return false;
+	});
+
+});
+
+</script>
 </body>
 </html>

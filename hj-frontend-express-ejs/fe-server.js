@@ -377,9 +377,33 @@ app.get('/chefs/me', ensureUserLoggedIn, function(req, res, next){
        return next(err);
      }
      if(data.status == 200){
-       res.render('me',{nav: 'me', loggedIn: req.user, chef: data.body});
+       res.render('me',{nav: 'me', loggedIn: req.user, chef: data.body, errorMessage: req.query.err});
      } else {
         res.render('error');
+     }
+   });
+});
+
+// edit chef profile submit
+app.post('/chefs/me', ensureUserLoggedIn, function(req, res, next){
+
+  //let email = req.body.email;
+  let name = req.body.name;
+  //let avatar = req.body.avatar;
+  //let locale = req.body.locale;
+
+  request
+   .patch(process.env.BACKEND + '/chefs/1')
+   .set('Authorization', 'Bearer ' + req.user.accessToken)
+   .send({name})
+   .end(function(err, data) {
+     if(err && err.status !== 404 && err.status !== 400) {
+       return next(err);
+     }
+     if(data.status == 200){
+       res.redirect('/chefs/me');
+     } else {
+       res.redirect('/chefs/me?err='+data.body.err);
      }
    });
 });
