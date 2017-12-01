@@ -42,6 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // aws image server baseurl and bucket
 app.locals.imageServer = process.env.AWS_URL;
 app.locals.imageDir = process.env.AWS_BUCKET;
+app.locals.analyticsId = process.env.ANALYTICS_ID;
 
 // set the directory to serve static assets
 app.use(express.static(__dirname + '/public', { maxAge: '1d' }));
