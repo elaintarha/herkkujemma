@@ -116,7 +116,7 @@ function addDatesToRecipes(recipes) {
 app.get('/', getPublicAccessToken, function(req, res, next){
 
   request
-    .get(process.env.BACKEND + '/recipes')
+    .get(process.env.BACKEND + '/recipes?limit=6')
     .set('Authorization', 'Bearer ' + req.access_token)
     .end(function(err, data) {
       if(err && err.status !== 404) {
