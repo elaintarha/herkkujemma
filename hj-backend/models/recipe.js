@@ -67,6 +67,24 @@ var RecipeSchema = new mongoose.Schema({
     }
 });
 
+RecipeSchema.virtual('slugName').get(function () {
+
+  if(!this.name) {
+    return null;
+  }
+
+  return this.name.toString().toLowerCase()
+  .replace(/\s+/g, '-')        // Replace spaces with -
+  .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
+  .replace(/\-\-+/g, '-')      // Replace multiple - with single -
+  .replace(/^-+/, '')          // Trim - from start of text
+  .replace(/-+$/, '');         // Trim - from end of text
+
+});
+
+RecipeSchema.set('toJSON', {
+    virtuals: true
+});
 
 RecipeSchema.pre('save', function(next) {
   var recipe = this;
