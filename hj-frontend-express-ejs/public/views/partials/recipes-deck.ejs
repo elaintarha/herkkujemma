@@ -9,7 +9,7 @@
        <% } else { %>data-src="holder.js/100px120?random=yes&font=FontAwesome&size=20&text=&#xf0f5;"<%}%>
        alt="Delicious image">
        <div class="card-body">
-         <h4 class="card-title"><a href="/recipes/<%=recipe.shortId%>"><%= recipe.name %></a></h4>
+         <h4 class="card-title"><a href="/recipes/<%=recipe.shortId%>/<%=recipe.slugName%>"><%= recipe.name %></a></h4>
          <p class="card-text"><%= recipe.description %></p>
        </div>
        <ul class="list-group list-group-flush">

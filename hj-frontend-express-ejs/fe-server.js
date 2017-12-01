@@ -288,7 +288,7 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
      });
 });
 
-app.get('/recipes/:id', getPublicAccessToken, function(req, res, next){
+app.get('/recipes/:id/:title?', getPublicAccessToken, function(req, res, next){
 
   var id = req.params.id;
 
@@ -305,6 +305,12 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res, next){
         if(!data.body._id) {
           return res.status(404).send("Sorry can't find that!");
         }
+
+        if(!req.params.title || (req.params.title !== data.body.slugName)) {
+          res.writeHead(301, { "Location": `/recipes/${id}/${data.body.slugName}` });
+          return res.end();
+        };
+
         data.body.createdAt
           = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
         res.render('recipe-view',
@@ -412,9 +418,10 @@ app.post('/chefs/me', ensureUserLoggedIn, function(req, res, next){
    });
 });
 
-app.get('/chefs/:id', getPublicAccessToken, function(req, res, next){
+app.get('/chefs/:id/:title?', getPublicAccessToken, function(req, res, next){
 
   var id = req.params.id;
+
 
   request
     .get(process.env.BACKEND + '/chefs/' + id)
