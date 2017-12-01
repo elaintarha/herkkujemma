@@ -10,21 +10,21 @@
  <h3>All recipes</h3>
 
  <% recipes.forEach(function(recipe, index) { %>
- <div class="row">
-        <div class="col-sm-4"><a href="/recipes/<%=recipe.shortId%>/<%=recipe.slugName%>" class="">
+ <div class="row border mb-3" style="background-color:#FFFFFF">
+        <div class="col-sm-2"><a href="/recipes/<%=recipe.shortId%>/<%=recipe.slugName%>" class="">
           <img class="img-fluid" <%if (recipe.pictureUrl) { %>
             src="<%=imageServer%>/<%=imageDir%>/<%=recipe.pictureUrl%>"
           <% } else { %>data-src="holder.js/100px120?random=yes&font=FontAwesome&size=20&text=&#xf0f5;"<%}%>
           alt="Delicious image" style="max-height:160px">
         </a>
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-8 mt-2">
           <h4 class="title"><a href="/recipes/<%=recipe.shortId%>/<%=recipe.slugName%>"><%= recipe.name %></a></h4>
           <p><%= recipe.description %></p>
           <p class="text-muted">By <a href="/chefs/<%=recipe.chef.shortId%>"><%=recipe.chef.name%></a> on <%=recipe.createdAt%></p>
         </div>
       </div>
-      <hr>
+
  <% }) %>
 
 <%- include ./partials/footer %>
