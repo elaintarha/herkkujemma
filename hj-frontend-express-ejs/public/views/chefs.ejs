@@ -18,7 +18,7 @@
           <h4 class="card-title"><img class="rounded-circle" style="max-height:50px" src="<%= chef.avatar %>" /> <%=chef.name%></h4>
           <h6 class="card-subtitle mb-2 text-muted">
             <%if(chef.name === 'jaacco') {%>Spaghetti code masterchef<%
-             } else if(chef.recipes.length === 0) {%>Shy chef<% 
+             } else if(chef.recipes.length === 0) {%>Shy chef<%
              } else {%>Masterchef in training<%}%>
           </h6>
           <p class="card-text">
@@ -37,10 +37,9 @@
       </div>
     </div>
   <% } %>
-
-
   </div>
-</div>
+
+<%- include ./partials/footer %>
 
 </body>
 </html>
