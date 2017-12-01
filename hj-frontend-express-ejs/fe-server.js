@@ -42,6 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // aws image server baseurl and bucket
 app.locals.imageServer = process.env.AWS_URL;
 app.locals.imageDir = process.env.AWS_BUCKET;
+// google analytics tag id if defined
 app.locals.analyticsId = process.env.ANALYTICS_ID;
 
 // set the directory to serve static assets
@@ -304,10 +305,12 @@ app.get('/recipes/:id', getPublicAccessToken, function(req, res, next){
         if(!data.body._id) {
           return res.status(404).send("Sorry can't find that!");
         }
-        data.body.createdAt = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
-        res.render('recipe-view', {nav:'recipes', loggedIn: req.user, recipe: data.body});
+        data.body.createdAt
+          = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
+        res.render('recipe-view',
+        {nav:'recipes', loggedIn: req.user, recipe: data.body, pageTitle: data.body.name});
       }
-    })
+    });
 });
 
 // process is be the same for the remaining routes
@@ -426,7 +429,8 @@ app.get('/chefs/:id', getPublicAccessToken, function(req, res, next){
         if(!data.body._id) {
           return res.status(404).send("Sorry can't find that!");
         }
-      res.render('chef', {nav:'chefs', loggedIn: req.user, chef: data.body});
+      res.render('chef',
+      {nav:'chefs', loggedIn: req.user, chef: data.body, pageTitle: data.body.name});
       }
     })
 });
