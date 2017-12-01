@@ -217,7 +217,16 @@ app.patch('/recipes', (req, res) => {
 });
 
 app.get('/recipes', function(req, res){
-  Recipe.find().populate('chef')
+
+  let limit = 299;
+  let limitParam = req.query.limit;
+
+  if(limitParam
+    && parseInt(limitParam) < limit ) {
+      limit = parseInt(limitParam);
+    }
+
+  Recipe.find().populate('chef').limit(limit)
   .then((recipes) => {
     res.json(recipes);
   }, (err) => {
