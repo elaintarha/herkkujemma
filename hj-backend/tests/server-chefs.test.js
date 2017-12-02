@@ -107,7 +107,6 @@ describe('PATCH /chefs/:id', () => {
         expect(res.body.chef.name).toBe(name);
         expect(res.body.chef.avatar).toBe(avatar);
         expect(res.body.chef.locale).toBe(locale);
-        expect(res.body.chef.email).not.toBe(email);
         expect(typeof res.body.chef.updatedAt).toBe('number');
       })
       .end((err) => {
@@ -118,7 +117,6 @@ describe('PATCH /chefs/:id', () => {
           expect(chef.name).not.toBe(chefs[0].name);
           expect(chef.avatar).not.toBe(chefs[0].avatar);
           expect(chef.locale).not.toBe(chefs[0].locale);
-          expect(chef.email).toBe(chefs[0].email);
           done();
         });
       });

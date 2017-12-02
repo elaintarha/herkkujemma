@@ -234,6 +234,26 @@ app.get('/recipes', function(req, res){
   });
 });
 
+app.get('/recipes/search/:name', function(req, res){
+
+  var name = req.params.name;
+  console.log('search', name);
+  let limit = 99;
+  let limitParam = req.query.limit;
+
+  if(limitParam
+    && parseInt(limitParam) < limit ) {
+      limit = parseInt(limitParam);
+    }
+
+  Recipe.find({name: new RegExp('.*'+name+'.*', "i")}).populate('chef').limit(limit)
+  .then((recipes) => {
+    res.json({recipes});
+  }, (err) => {
+    res.status(400).send(err);
+  });
+});
+
 app.get('/recipes/:id', (req, res) => {
   var shortId = req.params.id;
 
