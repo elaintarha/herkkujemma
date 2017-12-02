@@ -53,7 +53,8 @@ app.use(
   session({
     store: new LokiStore(
       {path: '../data-hj-ejs/session-store.db',
-      logErrors: true}),
+      logErrors: true,
+    ttl: 600}),
     secret: 'shhhhhhhh22',
     resave: false,
     saveUninitialized: false
@@ -542,7 +543,12 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-    console.error(err, err.stack);
+
+  if(err.status == '401') {
+    console.log('Token seems to have expired');
+    res.redirect('/login');
+  }
+  console.error(err, err.stack);
   res.status(500).send('Something broke!');
 });
 
