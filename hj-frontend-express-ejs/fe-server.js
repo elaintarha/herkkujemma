@@ -244,7 +244,6 @@ app.get('/recipes/search', getPublicAccessToken, function(req, res, next){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-        console.log(data.body.recipes);
         let recipes = addDatesToRecipes(data.body.recipes);
         res.render('recipes',
         {nav:'recipes', loggedIn: req.user,
