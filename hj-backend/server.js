@@ -237,7 +237,7 @@ app.get('/recipes', function(req, res){
 app.get('/recipes/search/:name', function(req, res){
 
   var name = req.params.name;
-  console.log('search', name);
+
   let limit = 99;
   let limitParam = req.query.limit;
 

@@ -229,6 +229,30 @@ app.get('/recipes', getPublicAccessToken, function(req, res, next){
     });
 });
 
+app.get('/recipes/search', getPublicAccessToken, function(req, res, next){
+
+  let errorMessage = req.query.err
+  var name = req.query.name;
+
+  request
+    .get(process.env.BACKEND + '/recipes/search/' + name)
+    .set('Authorization', 'Bearer ' + req.access_token)
+    .end(function(err, data) {
+      if(err && err.status !== 404) {
+        return next(err);
+      }
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+        console.log(data.body.recipes);
+        let recipes = addDatesToRecipes(data.body.recipes);
+        res.render('recipes',
+        {nav:'recipes', loggedIn: req.user,
+        recipes: data.body.recipes, pageTitle: 'Search results for ' + name} );
+      }
+    })
+});
+
 app.get('/recipes/add', ensureUserLoggedIn, function(req, res){
   let errorMessage = req.query.err
   let recipe = {name: ''};
@@ -317,6 +341,30 @@ app.get('/recipes/:id/:title?', getPublicAccessToken, function(req, res, next){
         {nav:'recipes', loggedIn: req.user, recipe: data.body, pageTitle: data.body.name});
       }
     });
+});
+
+app.get('/recipes/search/:name', ensureUserLoggedIn, function(req, res, next){
+
+  let errorMessage = req.query.err
+  var name = req.params.name;
+
+  request
+    .get(process.env.BACKEND + '/recipes/search/' + name)
+    .set('Authorization', 'Bearer ' + req.user.accessToken)
+    .end(function(err, data) {
+      if(err && err.status !== 404) {
+        return next(err);
+      }
+      if(data.status == 403){
+        res.send(403, '403 Forbidden');
+      } else {
+        console.log(data.body);
+        res.end();
+        //res.render('recipe-edit', {nav:'recipes',
+        //loggedIn: req.user, title: 'Edit', recipe: data.body,
+        //errorMessage: errorMessage});
+      }
+    })
 });
 
 // process is be the same for the remaining routes
