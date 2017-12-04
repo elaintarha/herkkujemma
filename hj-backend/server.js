@@ -226,7 +226,7 @@ app.get('/recipes', function(req, res){
       limit = parseInt(limitParam);
     }
 
-  Recipe.find().populate('chef').limit(limit)
+  Recipe.find().populate('chef').limit(limit).sort('-_id')
   .then((recipes) => {
     res.json(recipes);
   }, (err) => {
