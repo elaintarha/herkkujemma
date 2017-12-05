@@ -14,7 +14,7 @@ const {Chef} = require('./models/chef');
 const {Recipe} = require('./models/recipe');
 
 const app = express();
-app.use(logger('dev'));
+app.use(logger(process.env.NODE_ENV == 'production' ? 'short' : 'dev'));
 app.use(bodyParser.json());
 
 const jwtCheck = jwt({
