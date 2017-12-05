@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Working node.js and npm installation.
+Working node.js, npm and mongodb (local or remote) installations
 An Auth0 (free) account is required for access control mechanism.
 
 ```
@@ -27,7 +27,7 @@ git clone https://github.com/elaintarha/herkkujemma.git ./herkkujemma
 Navigate to API server directory and do npm install:
 ```
 cd herkkujemma/hj-backend
-npm install
+npm init
 ```
 Create and edit the config file (see also README-AUTH.MD):
 ```
@@ -39,13 +39,14 @@ You should be able to start the server without errors with "node server" and bro
 
 ### Installing client server(s)
 
-Currently there is only minimal node+express+ejs frontend server included.
+Currently there is only one front included, built with node+express+ejs.
+Npm sharp is used for image processing which requires npm node-gyp to be installed.
 
-Navigate to backend server directory and do npm install:
+Navigate to frontend server directory and do npm install:
 
 ```
 cd cd hj-frontend-express-ejs
-npm install express ejs superagent --save
+npm init
 
 ```
  Create and edit the server-config file (see also README-AUTH):
@@ -59,7 +60,6 @@ You should be able to start the server without errors with "node server" and bro
 
 ## Running the tests
 
-I haven't thought about this yet :(
 
 ### API Server
 
@@ -78,9 +78,6 @@ I haven't thought about this yet :(
 
 I haven't thought about this yet :(
 
-```
-Give an example
-```
 
 ## Deployment
 
@@ -88,8 +85,8 @@ I haven't thought about this yet :(
 
 ## Built With
 * [Mongoose]http://mongoosejs.com/) - MongoDB boilerplate help
-* [Express](https://expressjs.com/) - Minimal web framework for node.js
 * [Auth0](https://auth0.com/) - Authentication and authorization as service
+* [Express](https://expressjs.com/) - Minimal web framework for node.js
 
 
 ## Contributing
