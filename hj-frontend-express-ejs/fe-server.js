@@ -4,6 +4,7 @@ const request = require('superagent');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const helmet = require('helmet')
 const session = require('express-session');
 var LokiStore = require('connect-loki')(session);
 const dateFormat = require('dateformat');
@@ -34,6 +35,7 @@ passport.deserializeUser(function(user, done) {
 
 // create express app
 const app = express();
+app.use(helmet());
 app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
