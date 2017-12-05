@@ -84,7 +84,7 @@ router.delete('/', (req, res) => {
     })
     .then((recipeDb) => {
       if(!recipeDb) {
-        throw `Recipe was not found: ${body.shortId}`;
+        throw new Error(`Recipe was not found: ${body.shortId}`);
       }
       recipe = recipeDb;
       pictureToDelete = recipeDb.pictureUrl;
@@ -131,10 +131,10 @@ router.patch('/', (req, res) => {
   })
   .then((recipeDb) => {
     if(!recipeDb) {
-      throw `Recipe was not found: ${body.shortId}`;
+      throw new Error(`Recipe was not found: ${body.shortId}`);
     }
     if(recipeDb.chef._id.toHexString() !== chef._id.toHexString()) {
-      throw 'This is not your recipe';
+      throw new Error('This is not your recipe');
     }
 
     recipeDb.name = body.name;
