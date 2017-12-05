@@ -8,8 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Working node.js, npm and mongodb (local or remote) installations
-An Auth0 (free) account is required for access control mechanism.
+Working node.js, npm and mongodb (local or remote) installations. An Auth0 (free) account is required for access control mechanism.
 
 ```
 See README-AUTH.MD for configuring Auth0 via their web interface.
