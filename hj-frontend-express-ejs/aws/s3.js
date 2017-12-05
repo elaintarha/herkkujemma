@@ -44,12 +44,7 @@ function savePicture(type, file) {
 
 function delPicture(type, fileName) {
 
-  let bucketKey = 'hj-recipes';
-
-  if(type && type === 'chef') {
-    bucketKey = 'hj-chefs'
-  }
-
+  let bucketKey = process.env.AWS_BUCKET;
   var params = {Bucket: bucketKey, Key: fileName};
 
   var result = s3.deleteObject(params, function(err, data) {
