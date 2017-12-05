@@ -360,7 +360,6 @@ app.get('/recipes/search/:name', ensureUserLoggedIn, function(req, res, next){
       if(data.status == 403){
         res.send(403, '403 Forbidden');
       } else {
-        console.log(data.body);
         res.end();
         //res.render('recipe-edit', {nav:'recipes',
         //loggedIn: req.user, title: 'Edit', recipe: data.body,
