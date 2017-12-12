@@ -547,7 +547,7 @@ app.use(function (err, req, res, next) {
 
   if(err.status == '401') {
     console.log('Token seems to have expired');
-    res.redirect('/login');
+    return res.redirect('/login');
   }
   console.error(err, err.stack);
   res.status(500).send('Something broke!');
