@@ -98,7 +98,10 @@ function getPublicAccessToken(req, res, next){
       .end(function(err, res) {
         if(res.body.access_token){
           cachedServerAuthToken = res.body.access_token;
-          cachedServerAuthTokenTTL = new Date().getTime() + process.env.AUTH0_SERVER_TOKEN_TTL;
+          // convert auth0 seconds to ms
+          let tokenTTL = (999 * res.body.expires_in);
+          console.log(`New server token, TTL set to: ${tokenTTL} ms`);
+          cachedServerAuthTokenTTL = (new Date().getTime() + tokenTTL);
           req.access_token = res.body.access_token;
           next();
         } else {
