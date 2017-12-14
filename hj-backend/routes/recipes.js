@@ -37,8 +37,6 @@ router.post('/', (req, res) => {
 
     recipe = new Recipe(body);
     return recipe.save();
-  }, (err) => {
-      return res.status(400).send({recipe,err:err.message});
   })
   .then((recipeDb) => {
     recipe = recipeDb;
@@ -49,6 +47,7 @@ router.post('/', (req, res) => {
     return res.status(200).send({recipe});
   })
   .catch((err) => {
+    recipe.shortId = null;
     res.status(400).send({recipe, err:err.message});
   });
 
