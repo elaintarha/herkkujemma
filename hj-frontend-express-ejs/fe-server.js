@@ -97,16 +97,19 @@ function getPublicAccessToken(req, res, next){
       .send(serverAuth)
       .then((result) => {
         if(result.body.access_token) {
-          cachedServerAuthToken = result.body.access_token;
-          // convert auth0 seconds to ms
+                    // convert auth0 seconds to ms
           let tokenTTL = (999 * result.body.expires_in);
           console.log(`New server token, TTL set to: ${tokenTTL} ms`);
           cachedServerAuthTokenTTL = (new Date().getTime() + tokenTTL);
-          req.access_token = result.body.access_token;
+          cachedServerAuthToken = result.body.access_token;
+          req.access_token = cachedServerAuthToken;
           next();
         } else {
           res.send(401, 'Unauthorized');
         }
+      })
+      .catch((err) => {
+          return next(err);
       });
     }
 }
@@ -124,12 +127,12 @@ app.get('/', getPublicAccessToken, function(req, res, next){
   request
     .get(process.env.BACKEND + '/recipes?limit=6')
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
+    .then((data) => {
       let recipes = addDatesToRecipes(data.body);
       res.render('index', {nav:'index', loggedIn: req.user, recipes: recipes} );
+    })
+    .catch((err) => {
+        return next(err);
     });
 });
 
@@ -141,7 +144,7 @@ app.get('/about', function(req, res){
 
 // get token, add it to request header, get data and render it or deny
 // superagent does the handling of backend request
-app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(req, res){
+app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(req, res, next){
 
   let pictureUrl = req.body.pictureUrl;
   if(req.file) {
@@ -173,44 +176,44 @@ app.post('/recipes', ensureUserLoggedIn, upload.single('dishPicture'), function(
     }
   }
 
+  let thisRequest;
+
   if(shortId) {
-    request
-     .patch(process.env.BACKEND + '/recipes')
-     .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({shortId, name, description, cookingTime, portions, locale, ingredients, instructions, pictureUrl})
-     .end(function(err, data) {
-       return handlePostRecipeResult(req, res, err, data);
-     });
+   thisRequest =
+    request.patch(process.env.BACKEND + '/recipes')
+    .send({shortId, name, description, cookingTime, portions, locale, ingredients, instructions, pictureUrl})
   } else {
-    request
-     .post(process.env.BACKEND + '/recipes')
-     .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .send({name, description, cookingTime, portions,  locale, ingredients, instructions, pictureUrl})
-     .end(function(err, data) {
-       return handlePostRecipeResult(req, res, err, data);
-     });
+   thisRequest =
+    request.post(process.env.BACKEND + '/recipes')
+    .send({name, description, cookingTime, portions,  locale, ingredients, instructions, pictureUrl})
   }
+  thisRequest
+    .set('Authorization', 'Bearer ' + req.user.accessToken)
+    .then((data) => {
+      return handlePostRecipeResult(req, res, data);
+    })
+    .catch((err) => {
+       if(err.status == '400') {
+         return handlePostRecipeError(err, req, res);
+       }
+        return next(err);
+    });
 });
 
-function handlePostRecipeResult(req, res, err, data, next) {
-
-  if(err && err.status !== 404  && err.status !== 400) {
-    return next(err);
+function handlePostRecipeResult(req, res, data, next) {
+  if(data.body.pictureToDelete) {
+    s3.delPicture('recipe', data.body.pictureToDelete);
   }
+  res.redirect('/recipes/'+data.body.recipe.shortId);
+}
 
-  if(data.status == 200){
-    if(data.body.pictureToDelete) {
-      s3.delPicture('recipe', data.body.pictureToDelete);
-    }
-    res.redirect('/recipes/'+data.body.recipe.shortId);
+function handlePostRecipeError(err, req, res) {
+  if(err.response.body.recipe && err.response.body.recipe._id) {
+    res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
+    title: 'Edit', recipe: err.response.body.recipe, errorMessage: err.response.body.err});
   } else {
-    if(data.body.recipe && data.body.recipe._id) {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
-      title: 'Edit', recipe: data.body.recipe, errorMessage: data.body.err});
-    } else {
-      res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
-      title: 'Add', recipe: data.body.recipe, errorMessage: data.body.err});
-    }
+    res.render('recipe-edit', {nav:'recipes', loggedIn: req.user,
+    title: 'Add', recipe: err.response.body.recipe, errorMessage: err.response.body.err});
   }
 }
 
@@ -218,12 +221,12 @@ app.get('/recipes', getPublicAccessToken, function(req, res, next){
   request
     .get(process.env.BACKEND + '/recipes')
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
+    .then((data) => {
       let recipes = addDatesToRecipes(data.body);
       res.render('recipes', {nav:'recipes', loggedIn: req.user, recipes: recipes} );
+    })
+    .catch((err) => {
+        return next(err);
     });
 });
 
@@ -235,15 +238,15 @@ app.get('/recipes/search', getPublicAccessToken, function(req, res, next){
   request
     .get(process.env.BACKEND + '/recipes/search/' + name)
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
+    .then((data) => {
       let recipes = addDatesToRecipes(data.body.recipes);
       res.render('recipes',
       {nav:'recipes', loggedIn: req.user,
       recipes: data.body.recipes, pageTitle: 'Search results for ' + name} );
     })
+    .catch((err) => {
+        return next(err);
+    });
 });
 
 app.get('/recipes/add', ensureUserLoggedIn, function(req, res){
@@ -260,14 +263,14 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res, next){
   request
     .get(process.env.BACKEND + '/recipes/' + id)
     .set('Authorization', 'Bearer ' + req.user.accessToken)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
+    .then((data) => {
       res.render('recipe-edit', {nav:'recipes',
       loggedIn: req.user, title: 'Edit', recipe: data.body,
       errorMessage: errorMessage});
     })
+    .catch((err) => {
+        return next(err);
+    });
 });
 
 app.get('/recipes/delete/:id', ensureUserLoggedIn, function(req, res){
@@ -283,10 +286,7 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
      .delete(process.env.BACKEND + '/recipes')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
      .send({shortId})
-     .end(function(err, data) {
-       if(err && err.status !== 404) {
-         return next(err);
-       }
+     .then((data) => {
        if(!data.body.recipe._id) {
          return res.status(404).render('404');
        }
@@ -294,6 +294,9 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
          s3.delPicture('recipe', data.body.pictureToDelete);
        }
        res.redirect('/chefs/me');
+     })
+     .catch((err) => {
+         return next(err);
      });
 });
 
@@ -304,24 +307,21 @@ app.get('/recipes/:id/:title?', getPublicAccessToken, function(req, res, next){
   request
     .get(process.env.BACKEND + '/recipes/' + id)
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
-
+    .then((data) => {
       if(!data.body._id) {
         return res.status(404).render('404');
       }
-
       if(!req.params.title || (req.params.title !== data.body.slugName)) {
         res.writeHead(301, { "Location": `/recipes/${id}/${data.body.slugName}` });
         return res.end();
       };
-
       data.body.createdAt
         = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
       res.render('recipe-view',
       {nav:'recipes', loggedIn: req.user, recipe: data.body, pageTitle: data.body.name});
+    })
+    .catch((err) => {
+        return next(err);
     });
 });
 
@@ -330,13 +330,13 @@ app.get('/chefs', getPublicAccessToken, function(req, res, next){
   request
     .get(process.env.BACKEND + '/chefs')
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err) {
-        return next(err && err.status !== 404);
-      }
+    .then((data) => {
       let chefs = data.body;
       res.render('chefs', {nav:'chefs', loggedIn: req.user, chefs: chefs});
     })
+    .catch((err) => {
+        return next(err);
+    });
 });
 
 // chef signup page form
@@ -364,16 +364,17 @@ app.post('/chefs/signup', ensureUserLoggedIn, function(req, res, next){
    .post(process.env.BACKEND + '/chefs')
    .set('Authorization', 'Bearer ' + req.user.accessToken)
    .send({email, name, locale, avatar})
-   .end(function(err, data) {
-     if(err && err.status !== 404  && err.status !== 400) {
-       return next(err);
-     }
-     if(data.status == 200){
-       req.user.hasProfile = true;
-       res.redirect(req.session.returnTo || '/chefs/me');
-     } else {
+   .then((data) => {
+     req.user.hasProfile = true;
+     res.redirect(req.session.returnTo || '/chefs/me');
+   })
+   .catch((err) => {
+     if(err.status == 400) {
        req.user.hasProfile = false;
-        res.render('signup', {nav:'recipes', signupFields: data.body.chef, errorMessage: data.body.err});
+       res.render('signup', {nav:'recipes',
+       signupFields: err.response.body.chef, errorMessage: err.response.body.err});
+     } else {
+       return next(err);
      }
    });
 });
@@ -384,15 +385,11 @@ app.get('/chefs/me', ensureUserLoggedIn, function(req, res, next){
   request
    .get(process.env.BACKEND + '/chefs/me')
    .set('Authorization', 'Bearer ' + req.user.accessToken)
-   .end(function(err, data) {
-     if(err && err.status !== 404) {
+   .then((data) => {
+     res.render('me',{nav: 'me', loggedIn: req.user, chef: data.body, errorMessage: req.query.err});
+   })
+   .catch((err) => {
        return next(err);
-     }
-     if(data.status == 200){
-       res.render('me',{nav: 'me', loggedIn: req.user, chef: data.body, errorMessage: req.query.err});
-     } else {
-        res.render('error');
-     }
    });
 });
 
@@ -408,14 +405,14 @@ app.post('/chefs/me', ensureUserLoggedIn, function(req, res, next){
    .patch(process.env.BACKEND + '/chefs/1')
    .set('Authorization', 'Bearer ' + req.user.accessToken)
    .send({name})
-   .end(function(err, data) {
-     if(err && err.status !== 404 && err.status !== 400) {
-       return next(err);
-     }
-     if(data.status == 200){
-       res.redirect('/chefs/me');
+   .then((data) => {
+     res.redirect('/chefs/me');
+   })
+   .catch((err) => {
+     if(err.status == 400) {
+       res.redirect('/chefs/me?err='+err.response.body.err);
      } else {
-       res.redirect('/chefs/me?err='+data.body.err);
+       return next(err);
      }
    });
 });
@@ -424,20 +421,19 @@ app.get('/chefs/:id/:title?', getPublicAccessToken, function(req, res, next){
 
   var id = req.params.id;
 
-
   request
     .get(process.env.BACKEND + '/chefs/' + id)
     .set('Authorization', 'Bearer ' + req.access_token)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
+    .then((data) => {
       if(!data.body._id) {
         return res.status(404).render('404');
       }
       res.render('chef',
       {nav:'chefs', loggedIn: req.user, chef: data.body, pageTitle: data.body.name});
     })
+    .catch((err) => {
+        return next(err);
+    });
 });
 
 
@@ -462,19 +458,18 @@ app.get( '/callback', passport.authenticate('auth0', {
     request
      .get(process.env.BACKEND + '/chefs/me')
      .set('Authorization', 'Bearer ' + req.user.accessToken)
-     .end(function(err, data) {
-       if(err && err.status !== 404) {
-         return next(err);
-       }
-       if(data.status == 200){
-         req.user.hasProfile = true;
-         res.redirect(req.session.returnTo || '/chefs/me');
-       } else {
+     .then((data) => {
+       req.user.hasProfile = true;
+       res.redirect(req.session.returnTo || '/chefs/me');
+     })
+     .catch((err) => {
+       if(err.status == '404') {
          req.user.hasProfile = false;
          res.redirect('/chefs/signup');
+       } else {
+         return next(err);
        }
      });
-
   }
 );
 
@@ -493,7 +488,6 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-
   if(err.status == '401') {
     console.log('Token seems to have expired');
     return res.redirect('/login');
