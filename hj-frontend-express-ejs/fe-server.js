@@ -107,11 +107,7 @@ function getPublicAccessToken(req, res, next){
         } else {
           res.send(401, 'Unauthorized');
         }
-      })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).render('500');
-    });
+      });
     }
 }
 
@@ -311,7 +307,7 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
          res.send(403, '403 Forbidden');
        } else {
          if(!data.body.recipe._id) {
-           return res.status(404).send("Sorry can't find that!");
+           return res.status(404).render('404');
          }
          if(data.body.pictureToDelete) {
            s3.delPicture('recipe', data.body.pictureToDelete);
@@ -336,7 +332,7 @@ app.get('/recipes/:id/:title?', getPublicAccessToken, function(req, res, next){
         return res.send(403, '403 Forbidden');
       } else {
         if(!data.body._id) {
-          return res.status(404).send("Sorry can't find that!");
+          return res.status(404).render('404');
         }
 
         if(!req.params.title || (req.params.title !== data.body.slugName)) {
@@ -490,7 +486,7 @@ app.get('/chefs/:id/:title?', getPublicAccessToken, function(req, res, next){
         res.send(403, '403 Forbidden');
       } else {
         if(!data.body._id) {
-          return res.status(404).send("Sorry can't find that!");
+          return res.status(404).render('404');
         }
       res.render('chef',
       {nav:'chefs', loggedIn: req.user, chef: data.body, pageTitle: data.body.name});
@@ -547,7 +543,7 @@ app.get('/failure', function(req, res) {
 });
 
 app.use(function (req, res, next) {
-  res.status(404).send("Sorry can't find that!");
+  res.status(404).render('404');
 });
 
 app.use(function (err, req, res, next) {

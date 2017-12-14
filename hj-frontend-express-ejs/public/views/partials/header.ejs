@@ -7,20 +7,20 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item <%if(nav=='index'){%>active<%}%>">
+      <li class="nav-item <%if(locals.nav && nav=='index'){%>active<%}%>">
         <a class="nav-link" href="/">Home</a>
       </li>
-      <li class="nav-item <%if(nav=='recipes'){%>active<%}%>">
+      <li class="nav-item <%if(locals.nav && nav=='recipes'){%>active<%}%>">
         <a class="nav-link" href="/recipes">Recipes</a>
       </li>
-      <li class="nav-item <%if(nav=='chefs'){%>active<%}%>">
+      <li class="nav-item <%if(locals.nav && nav=='chefs'){%>active<%}%>">
         <a class="nav-link" href="/chefs">Chefs</a>
       </li>
-      <li class="nav-item <%if(nav=='about'){%>active<%}%>">
+      <li class="nav-item <%if(locals.nav && nav=='about'){%>active<%}%>">
         <a class="nav-link" href="/about">About</a>
       </li>
-     <% if(loggedIn) { %>
-      <li class="nav-item <%if(nav=='me'){%>active<%}%>">
+     <% if(locals.loggedIn) { %>
+      <li class="nav-item <%if(locals.nav && nav=='me'){%>active<%}%>">
         <a class="nav-link" href="/chefs/me">My profile</a>
       </li>
       <li class="nav-item">
