@@ -128,12 +128,8 @@ app.get('/', getPublicAccessToken, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        let recipes = addDatesToRecipes(data.body);
-        res.render('index', {nav:'index', loggedIn: req.user, recipes: recipes} );
-      }
+      let recipes = addDatesToRecipes(data.body);
+      res.render('index', {nav:'index', loggedIn: req.user, recipes: recipes} );
     });
 });
 
@@ -226,12 +222,8 @@ app.get('/recipes', getPublicAccessToken, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        let recipes = addDatesToRecipes(data.body);
-        res.render('recipes', {nav:'recipes', loggedIn: req.user, recipes: recipes} );
-      }
+      let recipes = addDatesToRecipes(data.body);
+      res.render('recipes', {nav:'recipes', loggedIn: req.user, recipes: recipes} );
     });
 });
 
@@ -247,14 +239,10 @@ app.get('/recipes/search', getPublicAccessToken, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        let recipes = addDatesToRecipes(data.body.recipes);
-        res.render('recipes',
-        {nav:'recipes', loggedIn: req.user,
-        recipes: data.body.recipes, pageTitle: 'Search results for ' + name} );
-      }
+      let recipes = addDatesToRecipes(data.body.recipes);
+      res.render('recipes',
+      {nav:'recipes', loggedIn: req.user,
+      recipes: data.body.recipes, pageTitle: 'Search results for ' + name} );
     })
 });
 
@@ -276,13 +264,9 @@ app.get('/recipes/edit/:id', ensureUserLoggedIn, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        res.render('recipe-edit', {nav:'recipes',
-        loggedIn: req.user, title: 'Edit', recipe: data.body,
-        errorMessage: errorMessage});
-      }
+      res.render('recipe-edit', {nav:'recipes',
+      loggedIn: req.user, title: 'Edit', recipe: data.body,
+      errorMessage: errorMessage});
     })
 });
 
@@ -303,17 +287,13 @@ app.post('/recipes/delete', ensureUserLoggedIn, function(req, res, next){
        if(err && err.status !== 404) {
          return next(err);
        }
-       if(data.status == 403){
-         res.send(403, '403 Forbidden');
-       } else {
-         if(!data.body.recipe._id) {
-           return res.status(404).render('404');
-         }
-         if(data.body.pictureToDelete) {
-           s3.delPicture('recipe', data.body.pictureToDelete);
-         }
-         res.redirect('/chefs/me');
+       if(!data.body.recipe._id) {
+         return res.status(404).render('404');
        }
+       if(data.body.pictureToDelete) {
+         s3.delPicture('recipe', data.body.pictureToDelete);
+       }
+       res.redirect('/chefs/me');
      });
 });
 
@@ -328,47 +308,21 @@ app.get('/recipes/:id/:title?', getPublicAccessToken, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        return res.send(403, '403 Forbidden');
-      } else {
-        if(!data.body._id) {
-          return res.status(404).render('404');
-        }
 
-        if(!req.params.title || (req.params.title !== data.body.slugName)) {
-          res.writeHead(301, { "Location": `/recipes/${id}/${data.body.slugName}` });
-          return res.end();
-        };
-
-        data.body.createdAt
-          = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
-        res.render('recipe-view',
-        {nav:'recipes', loggedIn: req.user, recipe: data.body, pageTitle: data.body.name});
+      if(!data.body._id) {
+        return res.status(404).render('404');
       }
+
+      if(!req.params.title || (req.params.title !== data.body.slugName)) {
+        res.writeHead(301, { "Location": `/recipes/${id}/${data.body.slugName}` });
+        return res.end();
+      };
+
+      data.body.createdAt
+        = dateFormat(objectIdToTimestamp(data.body._id), 'mediumDate');
+      res.render('recipe-view',
+      {nav:'recipes', loggedIn: req.user, recipe: data.body, pageTitle: data.body.name});
     });
-});
-
-app.get('/recipes/search/:name', ensureUserLoggedIn, function(req, res, next){
-
-  let errorMessage = req.query.err
-  var name = req.params.name;
-
-  request
-    .get(process.env.BACKEND + '/recipes/search/' + name)
-    .set('Authorization', 'Bearer ' + req.user.accessToken)
-    .end(function(err, data) {
-      if(err && err.status !== 404) {
-        return next(err);
-      }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        res.end();
-        //res.render('recipe-edit', {nav:'recipes',
-        //loggedIn: req.user, title: 'Edit', recipe: data.body,
-        //errorMessage: errorMessage});
-      }
-    })
 });
 
 // process is be the same for the remaining routes
@@ -380,12 +334,8 @@ app.get('/chefs', getPublicAccessToken, function(req, res, next){
       if(err) {
         return next(err && err.status !== 404);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        let chefs = data.body;
-        res.render('chefs', {nav:'chefs', loggedIn: req.user, chefs: chefs});
-      }
+      let chefs = data.body;
+      res.render('chefs', {nav:'chefs', loggedIn: req.user, chefs: chefs});
     })
 });
 
@@ -482,15 +432,11 @@ app.get('/chefs/:id/:title?', getPublicAccessToken, function(req, res, next){
       if(err && err.status !== 404) {
         return next(err);
       }
-      if(data.status == 403){
-        res.send(403, '403 Forbidden');
-      } else {
-        if(!data.body._id) {
-          return res.status(404).render('404');
-        }
+      if(!data.body._id) {
+        return res.status(404).render('404');
+      }
       res.render('chef',
       {nav:'chefs', loggedIn: req.user, chef: data.body, pageTitle: data.body.name});
-      }
     })
 });
 
