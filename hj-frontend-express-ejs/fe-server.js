@@ -95,19 +95,23 @@ function getPublicAccessToken(req, res, next){
     request
       .post(process.env.AUTH0_SERVER_AUTH_SERVER + '/oauth/token')
       .send(serverAuth)
-      .end(function(err, res) {
-        if(res.body.access_token){
-          cachedServerAuthToken = res.body.access_token;
+      .then((result) => {
+        if(result.body.access_token) {
+          cachedServerAuthToken = result.body.access_token;
           // convert auth0 seconds to ms
-          let tokenTTL = (999 * res.body.expires_in);
+          let tokenTTL = (999 * result.body.expires_in);
           console.log(`New server token, TTL set to: ${tokenTTL} ms`);
           cachedServerAuthTokenTTL = (new Date().getTime() + tokenTTL);
-          req.access_token = res.body.access_token;
+          req.access_token = result.body.access_token;
           next();
         } else {
           res.send(401, 'Unauthorized');
         }
-      });
+      })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).render('500');
+    });
     }
 }
 
@@ -553,7 +557,7 @@ app.use(function (err, req, res, next) {
     return res.redirect('/login');
   }
   console.error(err, err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).render('500');
 });
 
 // launch the frontend server
