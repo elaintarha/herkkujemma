@@ -149,7 +149,7 @@ app.get('/failure', function(req, res) {
   });
 });
 
-// catch all 404's
+// catch requests to undefined routes 404's
 app.use(function (req, res, next) {
   res.status(404).render('404');
 });
@@ -159,6 +159,10 @@ app.use(function (err, req, res, next) {
   if(err.status == '401') {
     console.log('Token seems to have expired');
     return res.redirect('/login');
+  }
+  // catch also undefined chef and recipe links
+  if(err.status == '404') {
+    return res.status(404).render('404');
   }
   console.error(err, err.stack);
   res.status(500).render('500');
